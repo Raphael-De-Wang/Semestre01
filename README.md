@@ -33,3 +33,6 @@ git remote add origin git@github.com:Raphael-De-Wang/Semestre01.git
 git push -u origin master
 
 
+git commit -a -m "Modifier Readme.md"
+git push
+
