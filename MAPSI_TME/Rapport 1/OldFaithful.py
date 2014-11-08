@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import numpy as np
 import math
 from pylab import *
+import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
@@ -112,19 +112,19 @@ def find_bounds ( data, params ):
     z_max = max ( mu_z0 + 2 * sigma_z0, mu_z1 + 2 * sigma_z1, data[:,1].max() )
     return ( x_min, x_max, z_min, z_max )
 
-def Q_i( data, params, weights ):
-
+def normale_bidim_fois_weights( data, params, weights ):
     length = len(data)
     rst = np.zeros((2,length))
-    
     for i in range(length):
         rst[0,i] = weights[0] * normale_bidim ( data[i,0], data[i,1], params[0] )
         rst[1,i] = weights[1] * normale_bidim ( data[i,0], data[i,1], params[1] )
+    return rst
     
+def Q_i( data, params, weights ):
+    rst = normale_bidim_fois_weights( data, params, weights )
     smt = rst[0] + rst[1]
     rst[0] = rst[0] / smt
     rst[1] = rst[1] / smt
-
     return rst
     
 def M_step ( data, Q, params, weights ):
@@ -196,11 +196,39 @@ def testcase_mise_au_point(fname):
     data = read_file(fname)
     params = get_params(data)
     weights = np.array ( [ 0.5, 0.5 ] )
-    gradients = EM (data, params, weights, 3 )
+    gradients = EM ( data, params, weights )
 
 #  ----- Approfondissements sur le TME 4 ----
-def courbe_de_vraisemblance():
-    return 0
+def evolution_des_vraisemblance( gradients, data ) :
+    Ni_log, Pi_log = [], []
+    x0, x1, P = [], [], []
+    log_x0, log_x1 = 0, 0
+    for ( params, weights ) in gradients:
+        Ni = np.log( normale_bidim_fois_weights( data, params, weights ) )
+        Ni_log.append(Ni)
+    Ni_log = np.array(Ni_log)
+    partition_list = np.array([ 1 if i > j else 0 for (i,j) in Ni_log[-1].T ])
+
+    for ( i, Ni ) in enumerate(Ni_log):
+        Q0_sum = sum(Ni[0])
+        Q1_sum = sum(Ni[1])
+        Wi = [ Q0_sum/(Q0_sum+Q1_sum), Q1_sum/(Q0_sum+Q1_sum) ]
+        log_x0 = sum( Ni_log[0] * Wi[0] * partition_list )
+        x0.append(log_x0)
+        log_x1 = sum( Ni_log[1] * Wi[1] * ( 1 - partition_list ) )
+        x1.append(log_x1)
+        # Pi_log = sum( Ni_log[0] * Wi[0] + Ni_log[1] * Wi[1] )
+        # P.append(Pi_log)
+        
+    iteration = range(len(gradients))
+    plt.xlabel('Iteration')
+    plt.ylabel('Vraisemblance')
+    plt.title('Evolution des vraisemblance')
+    plt.grid(True)
+    plt.plot(iteration, x0, color="blue", linewidth=2.5, linestyle="-")
+    plt.plot(iteration, x1, color="red",  linewidth=2.5, linestyle="-")
+    # plt.plot(iteration,  P, color="magenta", linestyle='dashed', marker="p")
+    plt.show()  
     
 def evolution_des_parametres ( gradients ) :
     
@@ -257,7 +285,7 @@ def main():
     data = read_file(fname)
     params = get_params(data)
     weights = np.array ( [ 0.5, 0.5 ] )
-    res_EM = EM ( data, params, weights )
+    res_EM = EM ( data, params, weights, epsilone = 0.005 )
     
     # evolution_des_parametres ( res_EM )
     # bounds = find_video_bounds ( data, res_EM )
@@ -270,7 +298,7 @@ def main():
     '''
     # -------- Approfondissements sur le TME 4 --------
     # -- 1. Courbe de vraisemblance --
-    # evolution_des_vraisemblance( res_EM, data )
+    evolution_des_vraisemblance( res_EM, data )
     
     # -- 2. Courbe d'évolution des paramètres --
     # evolution_des_parametres ( res_EM )
