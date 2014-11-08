@@ -277,8 +277,8 @@ def calcul_probabiliste (names, data, dico, res_data, res_dico, ficname) :
     # ---- P ( class | ring_number = o, gill size = n, cap shape = b ) ----
     proba = gnb.getPosterior ( bn, { 'ring number' : 'o', 'gill size' : 'n', 'cap shape' : 'b' }, 'class' )
     pretty_cpt ( proba )
-    gnb.showPosterior ( bn, { 'ring number' : 'o', 'gill size' : 'n', 'cap shape' : 'b' }, 'class' )
-    pretty_cpt ( bn.cpt ( bn.idFromName ( 'class' ) ) )
+    # gnb.showPosterior ( bn, { 'ring number' : 'o', 'gill size' : 'n', 'cap shape' : 'b' }, 'class' )
+    # pretty_cpt ( bn.cpt ( bn.idFromName ( 'class' ) ) )
     
 def main():
     fname = '2014_tme5_agaricus_lepiota.csv'

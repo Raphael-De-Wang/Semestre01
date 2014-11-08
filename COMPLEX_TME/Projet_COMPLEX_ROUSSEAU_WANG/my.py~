@@ -1,0 +1,215 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import numpy as np
+import time
+
+def read_file( fname="test.in" ):
+    with open(fname, 'r') as fb:
+        return np.array( [ ( int(line.strip().split()[1]), int(line.strip().split()[2]) ) \
+                           for line in fb if len(line.strip().split()) == 3 ] ) 
+    
+def generer_instance( n=10, low=1, high=10 ): 
+    return np.random.randint(low, high, (n,2))
+
+def trier(objets) : 
+    rates = np.divide(objets[:,1]*1.0, objets[:,0])
+    tpl = [ (rates[i],pv[0],pv[1]) for i,pv in enumerate(objets) ]
+    return np.array( [item[1:] for item in sorted(tpl, reverse=True)])
+    
+def trouver_solution(pmax, tab, objets) :
+    tab = tab[::-1,::-1]
+    for i, valeur in enumerate(tab[0]) :
+        if valeur <= pmax :
+            vmax = i
+            break
+            
+    valeur = tab[0, vmax]
+    print tab[:,vmax]
+    liste_objets = []
+    for i, v in enumerate(tab[:,vmax]):
+        if v <> valeur :
+            liste_objets.append(objets[len(tab)-i])
+            valeur = v
+    return liste_objets
+    
+def generer_tab(objets) :
+    '''
+    vmax = max(objets.T[1])
+    tab = np.zeros((len(objets), len(objets)*vmax))
+    '''
+    vmax = sum(objets.T[1])
+    tab = np.zeros((len(objets), vmax))
+    for i in range(len(objets)) : 
+        # for j in range(len(objets)*vmax):
+        for j in range(vmax):
+            if i == 0 :
+                if j == 0 :
+                    tab[i,j] = 0
+                else:
+                    tab[i,j] = np.inf
+            else :
+                tab[i,j] = min(tab[i-1,j], objets[i-1,0]+tab[i-1,j-objets[i-1,1]])
+    return tab
+    
+def pseudo_polynomial( objets , pmax):
+    print objets
+    objets = trier(objets)
+    print objets
+    tab = generer_tab( objets )
+    print tab
+    return trouver_solution(pmax, tab, objets)
+
+def generer_tab_approxime( obj, epsilone ) :
+    objets = np.empty_like (obj)
+    np.copyto(objets, obj)
+    vmax = sum(objets.T[1])
+    k = int(round((epsilone * vmax / len(objets))))
+    for objet in objets :
+        objet[1] /= k
+    tab = np.zeros((len(objets), vmax/k))
+    for i in range(len(objets)) : 
+        for j in range(vmax/k):
+            if i == 0 :
+                if j == 0 :
+                    tab[i][j] = 0
+                else:
+                    tab[i][j] = np.inf
+            else :
+                tab[i][j] = min(tab[i-1][j], objets[i-1][0]+tab[i-1][j-objets[i-1][1]])
+    return tab
+
+def pseudo_polynomial_approxime( objets , pmax, epsilone):
+    tab = generer_tab_approxime( objets, epsilone )
+    return trouver_solution(pmax, tab, objets)
+
+
+def borne_min(objets, pmax) :
+    value = 0;
+    i = 0;
+    while i < len(objets) :
+        if objets[i, 0] <= pmax :
+            value += objets[i, 1]
+            pmax -= objets[i, 0]
+        i += 1
+    return value
+
+def borne_max(objets, pmax): 
+    value = 0;
+    i = 0;
+    while i<len(objets)-1 and (pmax - objets[i, 0]) >= 0 :
+        value += objets[i, 1]
+        pmax -= objets[i, 0]
+        i += 1
+    value += objets[i, 1] * (float(pmax)/objets[i, 0]) 
+    return value
+    
+def recherche(objets, minimum, pmax):
+    #quand pmax = 0 ou qu'il n'y a plus d'objet on est au bout
+    if len(objets) == 0 or pmax == 0: 
+        return ([], 0); 
+    #bornes             
+    bmin = borne_min(objets, pmax)
+    bmax = borne_max(objets, pmax)
+    
+    #mise a jour des bornes
+    if bmin < minimum :
+        minimum = bmin
+    
+    if bmax < minimum :
+        return([], 0)
+    
+    if pmax - objets[0, 0] < 0 :
+        # l'objet est trop lourd on ne l'ajoute pas
+        return recherche(objets[1:], minimum, pmax)
+    else :
+        # branche ou on ne l'ajoute pas
+        s1 = recherche(objets[1:], minimum, pmax)
+        if s1[1] > minimum :
+            minimum = s1[1]
+        # branche ou on l'ajoute
+        s2 = recherche(objets[1:], minimum, pmax-objets[0, 0])
+        if s1[1]>s2[1]+objets[0, 1]:
+            return s1
+        else :
+            # return ([objets[0], s2[0]], s2[1]+objets[0][1])
+            res = [s2[0],objets[0]]
+            return (res, s2[1]+objets[0][1])
+
+def algorithme_arborescent(objets, pmax):
+    objets = trier(objets)
+    minimum = borne_min(objets, pmax)
+    solution = recherche(objets, minimum, pmax)
+    print("valeur de la solution : %d"%solution[1])
+    return solution[0]
+            
+def parcourtAleatoire(objets, pmax):
+    if len(objets) == 0 or pmax == 0 :
+        return ([], 0)
+    else :
+        if pmax - len(objets) < 0 : 
+            return parcourtAleatoire(objets[1:], pmax)
+        else:
+            if np.random.rand()  < 0.5 :
+                s = parcourtAleatoire(objets[1:], pmax-objets[0, 0])
+                return ((objets[0], s[0]), s[1]+objets[0][1])
+            else : 
+                return parcourtAleatoire(objets[1:], pmax)
+    
+def rasp(temps, objets, pmax) :
+    t1 = time.clock()
+    sopt = ([],0)
+    while(time.clock() - t1 < temps) :
+        s2 = parcourtAleatoire(objets, pmax)
+        if s2[1] > sopt[1]:
+            sopt = s2
+    print("Valeur de la solution optimale : %d"%sopt[1])
+    return sopt[0]
+
+def temps_calcul( objets, pmax, epsilon, temps ) :
+    print "Algorithme pseudo polynomial"
+    tps1 = time.clock()
+    pseudo_polynomial( objets )
+    tps2 = time.clock()
+    print "Temps d'execution : %d sec"%(tps2-tps1)
+    
+    print "Algorithme pseudo polynomial approxime"
+    tps1 = time.clock()
+    pseudo_polynomial_approxime( objets , pmax, epsilone)
+    tps2 = time.clock()
+    print "Temps d'execution : %d sec"%(tps2-tps1)
+    
+    print "Algorithme arborescent "    
+    tps1 = time.clock()
+    algorithme_arborescent(objets, pmax)
+    tps2 = time.clock()
+    print "Temps d'execution : %d sec"%(tps2-tps1)
+
+    print "Algorithme rasp"    
+    tps1 = time.clock()
+    rasp(temps, objets, pmax)
+    tps2 = time.clock()
+    print "Temps d'execution : %d sec"%(tps2-tps1)
+    
+def main():
+    pmax = 10
+    temps = 5
+    epsilone = 0.5
+    # obj = read_file()
+    obj = generer_instance()
+    
+    # objets = np.empty_like (obj)
+    # print obj
+    # np.copyto(objets, obj)
+    print pseudo_polynomial( obj , pmax )
+    '''
+    np.copyto(objets, obj)
+    print pseudo_polynomial_approxime( objets , pmax, epsilone)
+    np.copyto(objets, obj)
+    print algorithme_arborescent(objets, pmax)
+    np.copyto(objets, obj)
+    print rasp(temps, objets, pmax)
+    '''
+    
+    
+if __name__ == "__main__":
+    main()
