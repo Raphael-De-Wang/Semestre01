@@ -221,6 +221,8 @@ def evolution_des_vraisemblance( gradients, data ) :
         # P.append(Pi_log)
         
     iteration = range(len(gradients))
+    x0 = np.array(x0)
+    x1 = np.array(x1)
     plt.xlabel('Iteration')
     plt.ylabel('Vraisemblance')
     plt.title('Evolution des vraisemblance')
@@ -228,6 +230,7 @@ def evolution_des_vraisemblance( gradients, data ) :
     plt.plot(iteration, x0, color="blue", linewidth=2.5, linestyle="-")
     plt.plot(iteration, x1, color="red",  linewidth=2.5, linestyle="-")
     # plt.plot(iteration,  P, color="magenta", linestyle='dashed', marker="p")
+    plt.plot(iteration,  (x0 + x1)/2, color="magenta", linestyle='dashed', marker="p")
     plt.show()  
     
 def evolution_des_parametres ( gradients ) :

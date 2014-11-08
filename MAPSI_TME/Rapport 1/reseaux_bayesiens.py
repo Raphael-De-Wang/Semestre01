@@ -3,13 +3,13 @@
 import math
 import pydot        
 import numpy as np
-# import pyAgrum as gum
+import pyAgrum as gum
 import scipy.stats as stats
-# import gumLib.notebook as gnb
+import gumLib.notebook as gnb
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from mpl_toolkits.mplot3d import Axes3D
-# from gumLib.pretty_print import pretty_cpt
+from gumLib.pretty_print import pretty_cpt
 
 style = { "bgcolor" : "#6b85d1", "fgcolor" : "#FFFFFF" }
 
@@ -228,8 +228,8 @@ def display_BN ( node_names, bn_struct, bn_name, style ):
 def learn_parameters ( bn_struct, ficname ):
     # création du dag correspondant au bn_struct
     graphe = gum.DAG ()
-    nodes = [ graphe.addNode () for i in range ( bn_struct.shape[0] ) ]
-    for i in range ( bn_struct.shape[0] ):
+    nodes = [ graphe.addNode () for i in range ( len(bn_struct) ) ]
+    for i in range ( len(bn_struct) ):
         for parent in bn_struct[i]:
             graphe.addArc ( nodes[parent], nodes[i] )
 
@@ -245,29 +245,56 @@ def test_case_learn_BN_structure (names, data, dico, res_data, res_dico, img_nam
     print 'learn_BN_structure ( data, dico, 0.05 ): \n', bn_struct
     display_BN ( names, bn_struct, img_name, style )
 
-def apprentissage_calcul_probabiliste (names, data, dico, res_data, res_dico) :
+def apprentissage_calcul_probabiliste (names, data, dico, res_data, res_dico, ficname) :
     # création du réseau bayésien à la aGrUM
     bn_struct = learn_BN_structure ( data, dico, 0.05 )
-    bn = learn_parameters ( bn_struct, "BN" )
-    
+    bn = learn_parameters ( bn_struct, ficname )
+
     # affichage de sa taille
     print bn
     
+    # récupération de la ''conditional probability table'' (CPT) et affichage de cette table
+    pretty_cpt ( bn.cpt ( bn.idFromName ( 'bronchitis?' ) ) )
+    
+    gnb.showPosterior ( bn, {}, 'bronchitis?' )
+    gnb.showPosterior ( bn, {'smoking?': 'true', 'tuberculosis?' : 'false' }, 'bronchitis?' )
+    
+def calcul_probabiliste (names, data, dico, res_data, res_dico, ficname) :
+    # création du réseau bayésien à la aGrUM
+    bn_struct = learn_BN_structure ( data, dico, 0.05 )
+    bn = learn_parameters ( bn_struct, ficname )
+    
+    # ---- P ( class = p ), p signifie que votre champignon est vénéneux ----
+    proba = gnb.getPosterior ( bn, {}, 'class' )
+    pretty_cpt ( proba )
+
+    # ---- P ( gill spacing | class = p ) ----
+    proba = gnb.getPosterior ( bn, {'class':'p'}, 'gill spacing' )
+    pretty_cpt ( proba )
+    # gnb.showPosterior ( bn, {'class':'p'}, 'gill spacing' )
+    # pretty_cpt ( bn.cpt ( bn.idFromName ( 'gill spacing' ) ) )
+
+    # ---- P ( class | ring_number = o, gill size = n, cap shape = b ) ----
+    proba = gnb.getPosterior ( bn, { 'ring number' : 'o', 'gill size' : 'n', 'cap shape' : 'b' }, 'class' )
+    pretty_cpt ( proba )
+    gnb.showPosterior ( bn, { 'ring number' : 'o', 'gill size' : 'n', 'cap shape' : 'b' }, 'class' )
+    pretty_cpt ( bn.cpt ( bn.idFromName ( 'class' ) ) )
+    
 def main():
     fname = '2014_tme5_agaricus_lepiota.csv'
+    # fname = '2014_tme5_asia.csv'
     names, data, dico = read_csv ( fname )
     ( res_data, res_dico ) = translate_data ( data )
 
-    print names
-    print dico
-    print np.shape(data[0])
-    '''
+    # apprentissage_calcul_probabiliste (names, data, dico, res_data, res_dico, fname)
+    
     # ---- ---- Approfondissements sur le TME 5 ---- ----
 
     # -- 1. Structure du réseau agaricus-lepiota -- 
     test_case_learn_BN_structure (names, data, dico, res_data, res_dico, '2014_tme5_alarm')
 
-    # -- 2. Calculs de probabilité -- 
-    '''
+    # -- 2. Calculs de probabilité --
+    calcul_probabiliste (names, data, dico, res_data, res_dico, fname)
+    
 if __name__ == "__main__":
     main()
