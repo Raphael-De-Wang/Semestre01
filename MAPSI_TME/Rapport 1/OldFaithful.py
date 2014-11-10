@@ -44,6 +44,7 @@ def get_params_hasard (data) :
     hasard_point = np.round(np.random.rand() * len(data))
     data1 = data[hasard_point,0]
     data2 = data[hasard_point,1]
+    print "point hasard: ", data[hasard_point]
     return np.array ( [(data1 - 0.2, data2 - 1, std1, std2, 0),
                        (data1 + 0.2, data2 - 1, std1, std2, 0)] )
 
@@ -178,7 +179,7 @@ def EM ( data, params, weights, epsilone = 0.5 , iter_max = 100 ) :
         gradients.append( [ params, weights ] )
         if ( i > 2 and epsilone > np.mean( np.mean( np.abs( np.array( gradients[-1][0] ) - np.array( gradients[-2][0] ) ) ) ) ) or i > iter_max :
             # dessine(data, params, weights)
-            print "%d étapes de iteration"%(i+1)
+            print "%d étapes de iteration\n"%(i+1)
             return gradients
         
         i += 1
@@ -276,8 +277,6 @@ def convergence_depart_point_hasard (data):
     taille = len(data)
     params = get_params_hasard (data)
     weights = np.array ( [ 0.5, 0.5 ] )
-    print "params hasard: ", params
-    print "weights: ", weights
     return EM (data, params, weights, epsilone = 0.05 )
 
 def estimate_convergence_hasard(num_iter, data):
@@ -285,9 +284,6 @@ def estimate_convergence_hasard(num_iter, data):
     for i in range(num_iter):
         print "convergence hasard No.%d"%i
         res.append(convergence_depart_point_hasard(data)[-1])
-
-    evolution_des_vraisemblance( res, data )
-    evolution_des_parametres ( res )
         
 def main():
     fname = "2014_tme4_faithful.txt"

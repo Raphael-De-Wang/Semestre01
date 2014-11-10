@@ -25,7 +25,7 @@ def read_file ( filename ):
     
     return output
 
-def display_image ( X ):    
+def display_image ( X, fname=None):
     if X.size != 256:
         raise ValueError ( "Les images doivent etre de 16x16 pixels" )
     Y = X / X.max ()
@@ -35,24 +35,28 @@ def display_image ( X ):
 
     img.shape = (16,16,3)
     plt.imshow( img )
-    plt.show ()
+    
+    if fname != None:
+        plt.savefig(fname)
+    else:
+        plt.show ()
     
 def learnML_class_parameters ( classe ):
     mtx = np.zeros((len(classe.T),2))
     for i, pixte in enumerate(classe.T):
-        mtx[i] = np.array([pixte.mean(), pixte.var()]) # deriver
+        mtx[i] = np.array([pixte.mean(), pixte.var()]) 
     return mtx.T
 
 def learnML_all_parameters ( data ):
     return [ learnML_class_parameters ( classe ) for classe in data ]
 
 def images_des_mu ( params ) :
-    for param in params:
-        display_image ( param[0] )
+    for i, param in enumerate(params):
+        display_image ( param[0] , "mu-%d.png"%i )
         
 def images_des_variance ( params ) :
-    for param in params:
-        display_image ( param[1] )
+    for i, param in enumerate(params):
+        display_image ( param[0] , "var-%d.png"%i )
 
 def log_loi_normale ( x, mu, var ) :
     z = (( x - mu ) ** 2)/( 2 * var )
