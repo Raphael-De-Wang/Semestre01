@@ -131,9 +131,10 @@ def indep_score( data, dico, x, y, z ) :
     (khi_carre, DoF) = sufficient_statistics ( data, dico, x, y, z )
     
     if D_min (X, Y, Z) < len(data) :
-        ( khi_carre, DoF ) = ( -1, 1 )
+        # ( khi_carre, DoF ) = ( -1, 1 )
+        return ( -1, 1 )
 
-    return stats.chi2.sf ( khi_carre, DoF )
+    return stats.chi2.sf ( khi_carre, DoF ), DoF
 
 def test_case_indep_score (names, data, dico, res_data, res_dico) :
     print 'indep_score( data, dico, 1, 3, [] ): \n', indep_score( data, dico, 1, 3, [] )
@@ -146,16 +147,11 @@ def best_candidate ( data, dico, x, z, alpha ) :
     p_valeurs = []
     
     for y in range( x ):
-        p_valeurs.append( indep_score( data, dico, x, y, z ) )
+        p_val, DoF = indep_score( data, dico, x, y, z )
+        p_valeurs.append(p_val)
 
-    try:
-        if len(p_valeurs) == 0 or min( p_valeurs ) > alpha :
+    if len(p_valeurs) == 0 or min( p_valeurs ) > alpha :
             return []
-    except:
-        print p_valeurs
-        print len(p_valeurs)
-        print min( p_valeurs )
-        raise
             
     return [ np.argmin(p_valeurs) ]
 
@@ -184,10 +180,8 @@ def parents_merge(dico, list_tgt, list_src):
             
 def create_parents ( data, dico, x, alpha ):
     parents = []
-    while True :
+    for i in range(0, x):
         parents, add_num = parents_merge( dico, parents, best_candidate ( data, dico, x, parents, alpha ) )
-        if add_num == 0 :
-            break
             
     return parents
 
@@ -264,6 +258,10 @@ def calcul_probabiliste (names, data, dico, res_data, res_dico, ficname) :
     bn_struct = learn_BN_structure ( data, dico, 0.05 )
     bn = learn_parameters ( bn_struct, ficname )
     
+    print bn
+
+    # pretty_cpt(bn.cpt(bn.idFromName('gill spacing')))
+    
     # ---- P ( class = p ), p signifie que votre champignon est vénéneux ----
     proba = gnb.getPosterior ( bn, {}, 'class' )
     pretty_cpt ( proba )
@@ -279,10 +277,9 @@ def calcul_probabiliste (names, data, dico, res_data, res_dico, ficname) :
     pretty_cpt ( proba )
     # gnb.showPosterior ( bn, { 'ring number' : 'o', 'gill size' : 'n', 'cap shape' : 'b' }, 'class' )
     # pretty_cpt ( bn.cpt ( bn.idFromName ( 'class' ) ) )
-    
+        
 def main():
     fname = '2014_tme5_agaricus_lepiota.csv'
-    # fname = '2014_tme5_asia.csv'
     names, data, dico = read_csv ( fname )
     ( res_data, res_dico ) = translate_data ( data )
 
@@ -291,7 +288,7 @@ def main():
     # ---- ---- Approfondissements sur le TME 5 ---- ----
 
     # -- 1. Structure du réseau agaricus-lepiota -- 
-    test_case_learn_BN_structure (names, data, dico, res_data, res_dico, '2014_tme5_alarm')
+    test_case_learn_BN_structure (names, data, dico, res_data, res_dico, 'AgaricusLepiota')
 
     # -- 2. Calculs de probabilité --
     calcul_probabiliste (names, data, dico, res_data, res_dico, fname)

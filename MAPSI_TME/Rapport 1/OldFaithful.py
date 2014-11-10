@@ -31,16 +31,21 @@ def get_params(data):
     std1 = data[:,0].std ()
     std2 = data[:,1].std ()
 
-    params = np.array ( [(mean1 - 0.2, mean2 - 1, std1, std2, 0),
-                         (mean1 + 0.2, mean2 + 1, std1, std2, 0)] )
+    return np.array ( [(mean1 - 0.2, mean2 - 1, std1, std2, 0),
+                       (mean1 + 0.2, mean2 - 1, std1, std2, 0)] )
     
-    return params
+def get_params_hasard (data) :
+    # return get_params( data, np.random.rand(200, 2)*scale )
+    # return get_params( data, np.max(data, 0) * np.random.rand(2) * 2 )
+    
+    std1 = data[:,0].std ()
+    std2 = data[:,1].std ()
 
-def get_params_hasard (scale) :
-    params = np.random.rand(2,5) * scale
-    params[0,-1] = 0
-    params[1,-1] = 0
-    return params
+    hasard_point = np.round(np.random.rand() * len(data))
+    data1 = data[hasard_point,0]
+    data2 = data[hasard_point,1]
+    return np.array ( [(data1 - 0.2, data2 - 1, std1, std2, 0),
+                       (data1 + 0.2, data2 - 1, std1, std2, 0)] )
 
 def normale_bidim ( x, z, params ):
     mu_x, mu_z, sigma_x, sigma_z, rho = params
@@ -163,17 +168,19 @@ def dessine(data, params, weights):
     dessine_normales ( data, params, weights, bounds, ax )
     plt.show ()
     
-def EM ( data, params, weights, epsilone = 0.05 , iter_max = 100 ) : 
+def EM ( data, params, weights, epsilone = 0.5 , iter_max = 100 ) : 
     gradients = []
     i = 0
+    gradients.append( [ params, weights ] )
     while True:
-        # print 'Iteration: %d'%i
         Q = Q_i( data, params, weights )
-        [ params, weights ] = M_step ( data, Q, params, weights )
+        ( params, weights ) = M_step ( data, Q, params, weights )
         gradients.append( [ params, weights ] )
-        if ( i > 2 and epsilone > np.mean( np.mean( np.abs( np.array( gradients[-1] ) - np.array( gradients[-2] ) ) ) ) ) or i > iter_max :
-            dessine(data, params, weights)
+        if ( i > 2 and epsilone > np.mean( np.mean( np.abs( np.array( gradients[-1][0] ) - np.array( gradients[-2][0] ) ) ) ) ) or i > iter_max :
+            # dessine(data, params, weights)
+            print "%d étapes de iteration"%(i+1)
             return gradients
+        
         i += 1
 
 def find_video_bounds ( data, res_EM ):
@@ -210,16 +217,9 @@ def evolution_des_vraisemblance( gradients, data ) :
     partition_list = np.array([ 1 if i > j else 0 for (i,j) in Ni_log[-1].T ])
 
     for ( i, Ni ) in enumerate(Ni_log):
-        Q0_sum = sum(Ni[0])
-        Q1_sum = sum(Ni[1])
-        Wi = [ Q0_sum/(Q0_sum+Q1_sum), Q1_sum/(Q0_sum+Q1_sum) ]
-        log_x0 = sum( Ni_log[0] * Wi[0] * partition_list )
-        x0.append(log_x0)
-        log_x1 = sum( Ni_log[1] * Wi[1] * ( 1 - partition_list ) )
-        x1.append(log_x1)
-        # Pi_log = sum( Ni_log[0] * Wi[0] + Ni_log[1] * Wi[1] )
-        # P.append(Pi_log)
-        
+        x0.append(sum(Ni[0] * partition_list))
+        x1.append(sum(Ni[1] * (1 - partition_list)))
+
     iteration = range(len(gradients))
     x0 = np.array(x0)
     x1 = np.array(x1)
@@ -229,9 +229,8 @@ def evolution_des_vraisemblance( gradients, data ) :
     plt.grid(True)
     plt.plot(iteration, x0, color="blue", linewidth=2.5, linestyle="-")
     plt.plot(iteration, x1, color="red",  linewidth=2.5, linestyle="-")
-    # plt.plot(iteration,  P, color="magenta", linestyle='dashed', marker="p")
     plt.plot(iteration,  (x0 + x1)/2, color="magenta", linestyle='dashed', marker="p")
-    plt.show()  
+    plt.show()
     
 def evolution_des_parametres ( gradients ) :
     
@@ -263,25 +262,33 @@ def evolution_des_parametres ( gradients ) :
     plt.plot(x, sigma_x0, color="yellow", linewidth=2.5, linestyle="", label="$\sigma\ x0$")
     plt.plot(x, sigma_z0, color="cyan", linewidth=2.5, linestyle="-", label="$\sigma\ z0$")
     # ! probleme de charactor special \rho
-    plt.plot(x, rho0, color="magenta", linewidth=2.5, linestyle="-", label="$\sigma$")
+    plt.plot(x, rho0, color="magenta", linewidth=2.5, linestyle="-", label="$rho\ 0$")
     plt.plot(x, mu_x1, color="blue", linestyle='dashed', marker="o", label="$\mu\ x1$")
     plt.plot(x, mu_z1, color="red", linestyle='dashed', marker="^", label="$\mu\ z1$")
     plt.plot(x, sigma_x1, color="yellow", linestyle='dashed', marker="s", label="$\sigma\ x1$")
     plt.plot(x, sigma_z1, color="cyan", linestyle='dashed', marker="*", label="$\sigma\ z1$")
     # ! probleme de charactor special \rho
-    plt.plot(x, rho1, color="magenta", linestyle='dashed', marker="p", label="cos")# "$\rho\ 1$")
+    plt.plot(x, rho1, color="magenta", linestyle='dashed', marker="p", label="$rho\ 1$")
     plt.legend(loc='upper right')
     plt.show()  
     
-def convergence_depart_point_hasard ():
-    fname = "2014_tme4_faithful.txt"
-    data = read_file(fname)
-    params = get_params_hasard (50)
+def convergence_depart_point_hasard (data):
+    taille = len(data)
+    params = get_params_hasard (data)
     weights = np.array ( [ 0.5, 0.5 ] )
-    # res_EM = EM (data, params, weights, steps = 5 )
-    res_EM = EM (data, params, weights, epsilone = 0.05 )
-    print np.mean( np.mean( np.abs( np.array( res_EM[-1] ) - np.array( res_EM[-2] ) ) ) )
+    print "params hasard: ", params
+    print "weights: ", weights
+    return EM (data, params, weights, epsilone = 0.05 )
 
+def estimate_convergence_hasard(num_iter, data):
+    res = []
+    for i in range(num_iter):
+        print "convergence hasard No.%d"%i
+        res.append(convergence_depart_point_hasard(data)[-1])
+
+    evolution_des_vraisemblance( res, data )
+    evolution_des_parametres ( res )
+        
 def main():
     fname = "2014_tme4_faithful.txt"
     # testcase_mise_au_point(fname)
@@ -304,12 +311,12 @@ def main():
     evolution_des_vraisemblance( res_EM, data )
     
     # -- 2. Courbe d'évolution des paramètres --
-    # evolution_des_parametres ( res_EM )
+    evolution_des_parametres ( res_EM )
     
     # -- 3. Convergence --
-    # convergence_depart_point_hasard ()
-
-
+    num_iter = 10
+    # convergence_depart_point_hasard (data)
+    estimate_convergence_hasard(num_iter, data)
 
 if __name__ == "__main__":
     main()

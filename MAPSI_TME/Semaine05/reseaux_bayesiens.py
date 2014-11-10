@@ -131,9 +131,10 @@ def indep_score( data, dico, x, y, z ) :
     (khi_carre, DoF) = sufficient_statistics ( data, dico, x, y, z )
     
     if D_min (X, Y, Z) < len(data) :
-        ( khi_carre, DoF ) = ( -1, 1 )
+        # ( khi_carre, DoF ) = ( -1, 1 )
+        return ( -1, 1 )
 
-    return stats.chi2.sf ( khi_carre, DoF )
+    return stats.chi2.sf ( khi_carre, DoF ), DoF
 
 def test_case_indep_score (names, data, dico, res_data, res_dico) :
     print 'indep_score( data, dico, 1, 3, [] ): \n', indep_score( data, dico, 1, 3, [] )
@@ -146,7 +147,8 @@ def best_candidate ( data, dico, x, z, alpha ) :
     p_valeurs = []
     
     for y in range( x ):
-        p_valeurs.append( indep_score( data, dico, x, y, z ) )
+        p_val, DoF = indep_score( data, dico, x, y, z )
+        p_valeurs.append( p_val ) 
 
     if len(p_valeurs) == 0 or min( p_valeurs ) > alpha :
             return []
@@ -178,12 +180,10 @@ def parents_merge(dico, list_tgt, list_src):
             
 def create_parents ( data, dico, x, alpha ):
     parents = []
-    while True :
+    while True:
         parents, add_num = parents_merge( dico, parents, best_candidate ( data, dico, x, parents, alpha ) )
-        if add_num == 0 :
-            break
-            
-    return parents
+        if add_num == 0:
+            return parents
 
 def test_case_create_parents (names, data, dico, res_data, res_dico) :
     
@@ -264,12 +264,12 @@ def apprentissage_calcul_probabiliste (names, data, dico, res_data, res_dico) :
     gnb.showPosterior ( bn, {'smoking?': 'true', 'tuberculosis?' : 'false' }, 'bronchitis?' )
     
 def main():
-    fname = '2014_tme5_asia.csv'
+    # fname = '2014_tme5_asia.csv'
     # fname = '2014_tme5_asia3.csv'
     # fname = '2014_tme5_adult.csv'
     # fname = '2014_tme5_car.csv'
     # fname = '2014_tme5_agaricus_lepiota.csv'
-    # fname = '2014_tme5_alarm.csv'
+    fname = '2014_tme5_alarm.csv'
 
     names, data, dico = read_csv ( fname )
     ( res_data, res_dico ) = translate_data ( data )
@@ -278,7 +278,7 @@ def main():
     # test_case_indep_score (names, data, dico, res_data, res_dico)
     # test_case_best_candidate (names, data, dico, res_data, res_dico)
     # test_case_create_parents (names, data, dico, res_data, res_dico)
-    test_case_learn_BN_structure (names, data, dico, res_data, res_dico, fname.split('.')[0])
+    test_case_learn_BN_structure (names, data, dico, res_data, res_dico, 'Alarm')
     # apprentissage_calcul_probabiliste (names, data, dico, res_data, res_dico)
     
 if __name__ == "__main__":
