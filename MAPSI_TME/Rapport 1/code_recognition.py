@@ -56,7 +56,7 @@ def images_des_mu ( params ) :
         
 def images_des_variance ( params ) :
     for i, param in enumerate(params):
-        display_image ( param[0] , "var-%d.png"%i )
+        display_image ( param[1] , "var-%d.png"%i )
 
 def log_loi_normale ( x, mu, var ) :
     z = (( x - mu ) ** 2)/( 2 * var )
