@@ -178,9 +178,7 @@ def EM ( data, params, weights, epsilone = 0.01 , iter_max = 100 ) :
         Q = Q_i( data, params, weights )
         ( params, weights ) = M_step ( data, Q, params, weights )
         gradients.append( [ params, weights ] )
-        # if ( i > 2 and epsilone > np.mean( np.mean( np.abs( np.array( gradients[-1][0] ) - np.array( gradients[-2][0] ) ) ) ) ) or i > iter_max :
-        if i > 2 :
-            if epsilone > np.mean( np.mean( np.abs( np.array( gradients[-1][0] ) - np.array( gradients[-2][0] ) ) ) ) ) or i > iter_max :
+        if ( i > 2 and epsilone > np.mean( np.mean( np.abs( np.array( gradients[-1][0] ) - np.array( gradients[-2][0] ) ) ) ) ) or i > iter_max :
             # dessine(data, params, weights)
             print "%d étapes de iteration\n"%(i+1)
             return gradients
