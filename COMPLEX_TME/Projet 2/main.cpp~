@@ -1,0 +1,67 @@
+#include <iostream>
+#include <gmpxx.h>
+#include <ctime>
+/*export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib*/
+using namespace std;
+void my_pgcd(mpz_class a, mpz_class b, mpz_class& pgcd){
+	if(b > a){
+		mpz_class c;
+		c = b;
+		b = a;
+		a = c;
+	}
+	mpz_class r(a%b);
+	while (r != 0){
+		a = b;
+		b = r;
+		r = a%b;
+	}
+	pgcd = b;
+}
+
+void testPGCD(){
+	mpz_class a, b, pgcd;
+	cout << "a = ";
+	cin >> a;
+	cout << "b = ";
+	cin >> b;    
+	my_pgcd(b, a, pgcd);
+	cout << "pgcd("<<a<<", "<<b<<") = "<<pgcd<<endl;
+}
+
+bool first_test(mpz_class n){
+	for(int i = 2; i <= sqrt(n); i++){
+		if (n%i==0){
+			return false;
+		}
+	}
+	return true;
+}
+
+size_t testNaif(size_t max){
+	size_t nb = 0; 
+	for(int i = 2; i < max; i++){
+		if (first_test(i)){
+			nb ++;
+		}
+	}
+	return nb;
+}
+
+size_t tempsTestNaif(mpz_class a){
+	time_t tbegin;
+	bool premier;
+	tbegin=time(NULL);
+	premier = first_test(a);
+	cout << "temps : " << difftime(time(NULL), tbegin) << "sec"<< "premier ? "<<premier<<a;
+}
+
+int main (void){
+	mpz_class a;
+	cout << "a : ";
+	cin >> a;
+	//testPGCD();
+	//cout << "nombre de premiers inferieur a 100 000 : " << testNaif(100000) << endl;
+	tempsTestNaif(a);
+	return 0;
+}
