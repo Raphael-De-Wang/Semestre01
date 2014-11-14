@@ -16,3 +16,9 @@ def create_exemplaires_table(num_bien):
     
 def contrante_matrice():
     
+
+
+
+
+
+    
