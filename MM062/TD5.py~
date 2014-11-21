@@ -1,0 +1,99 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# ---- Exercise 1 Methode de resoluton numerique dans les systemes dynamiques -----
+def f(x):
+    # ---- Question 1: (1) ----
+    return 0.1 * x * ( 30 - x )
+
+# ---- Question 7 ----
+def f2(variable):
+    [ x, y ] = variable
+    return np.array([0.25*x - 0.01*x*y, 0.01*x*y - y])
+
+def init_x(x0, n):
+    if type(x0) == type([]):
+        x = np.zeros([n,len(x0)])
+    else:
+        x = np.zeros([n,])
+    x[0] = x0
+    return x
+    
+def euler(func, x0, tf = 100, n = 500):
+    h = tf/float(n)
+    x = init_x(x0, n)
+    # ---- QUESTION 2: (2) -----
+    for i in range(n-1):
+        # ---- QUESTION 2: (3) -----
+        x[i+1] = x[i] + h * func(x[i])
+    return x
+
+def RK2(func, x0, tf = 100, n = 500):
+    h = tf/float(n)
+    x = init_x(x0, n)
+    for i in range(n-1):
+        x[i+1] = x[i] + (h/2) * func(x[i]) + (h/2) * func(x[i]+h*func(x[i]))
+    return x
+    
+def desine():
+    fig = plt.figure()
+
+    # ---- Question 3 ----
+    plt.plot(euler(f,5),   label='x0=5 euler')
+    plt.plot(euler(f,50),  label='x0=50 euler')
+    
+    # ---- Question 5 ----
+    plt.plot(RK2(f,5),  label='x0=5 euler')
+    plt.plot(RK2(f,50), label='x0=50 euler')
+    
+    # ---- Hors de Question ----
+    points = euler(f,[80,30])
+    plt.plot(points[:,0], points[:,1], label='x0=80, y0=30 euler')
+    points = RK2(f,[80,30])
+    plt.plot(points[:,0], points[:,1], label='x0=80, y0=30 RK2')
+    
+    # ---- Question 8 ----
+    points = euler(f2,[80,30])
+    plt.plot(points[:,0], points[:,1],label='x0=80, y0=30 euler')
+    points = RK2(f2,[80,30])
+    plt.plot(points[:,0], points[:,1],label='x0=80, y0=30 RK2')
+
+    plt.xlabel('Time')
+    plt.ylabel('Population Number')
+    plt.legend()
+    plt.show()
+
+# desine()
+
+# ---- Exercise 2 Equation de diffusion ----
+
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+
+tf = 100
+nt = 100
+nx = 100
+a = 0.001
+x = 10
+dt = x / float(nt)
+dx = x / float(nx)
+x0 = nx / 2.
+
+U = np.zeros([nt,nx])
+U[0,x0] = 1
+
+for k in range (0,nt-10):
+    for i in range (1,nx-1):
+        U[k+1,i] = U[k,i] + a * dt (U[k,i-1] - 2 * U[k,i] + U[k,i+1]) / ( dx ** 2 )
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+X = np.arange(0, x, dx)
+T = np.arange(0, tf, dt)
+X, T = np.meshgrid(X, T)
+surf = ax.plot_surface( X, T, U, rstride = 1, cstride = 1, cmap = cm.coolwarm, linewidth = 0, antialiased = False)
+fig.colorbar(surf)
+plt.show()
+
+
