@@ -10,19 +10,17 @@
 # Yvan SRAKA 3401082
 
 import math
-
+import time
 import numpy as np
 import gurobipy as gb
 
 from pygraph.classes.digraph import digraph
 from pygraph.algorithms.minmax import maximum_flow
 
-
 def valeurs_table_aleatoire(n, m, M):
     return np.round(np.random.triangular(0, M / 2, M, (n, m)))
 
 # classe abstraite
-
 class Modelisation:
 
     def __init__(self, contr_a, contr_b, coe_func_obj, model_name):
@@ -65,7 +63,11 @@ class Modelisation:
 
     def get_runtime(self):
         return self.model.Runtime
-
+    
+    def rapport(self, fname, contenu):
+        fb = open(fname,'a')
+        fb.write(contenu)
+        fb.close()
 
 class Simple_Model(Modelisation):
 
@@ -109,6 +111,26 @@ class Simple_Model(Modelisation):
         for i in range(self.nbvar):
             self.expr += self.coe_func_obj[i] * self.var_list[i]
         self.model.setObjective(self.expr, gb.GRB.MAXIMIZE)
+
+    def agent_prend_objet(self):
+        obj_lst = []
+        for j in range(self.nbvar):
+            if self.var_list[j].x == 1:
+                # agent = j / self.objet_num()
+                objet = j % self.objet_num()
+                # print "L'agent %d prend l'objet %d\tvaleur: %d\tvaleur max: %d" % (agent, objet, self.val_tb[agent][objet], max(self.val_tb[agent]))
+                obj_lst.append(objet)
+        return obj_lst
+
+    def agent_prend_valeur(self):
+        val_lst = []
+        for j in range(self.nbvar):
+            if self.var_list[j].x == 1:
+                agent = j / self.objet_num()
+                objet = j % self.objet_num()
+                valeur = self.val_tb[agent][objet]
+                val_lst.append(valeur)
+        return val_lst
 
 class Approche_Egalitariste_MaxMin(Simple_Model):
 
@@ -215,81 +237,55 @@ class Approche_Egalitariste_Max_Flow:
         for i in self.solution:
             print "L'agent %d prend l'objet %d" % i
 
+def general_test( N, M, num_iter, fname, Model):
+    
+    report = "Resultat: \n"
+    
+    for m in M:
+        for n in N:
+            valeur_table = []
+            report += "\n\n[ M = %d ]\n"%(m)
+            report += "---------------------------------------------------------------\n"
+            report += "\tn\tt\tmoy/M\tmin/M\tmax/M\n"
+            report += "---------------------------------------------------------------\n"
+            t1 = time.time()
+            
+            for i in range(num_iter):
+                md = Model(n, n, m, "model_m_eq_n_%d%d%d"%(m,n,i))
+                md.resoudre()
+                valeur_table.append(md.agent_prend_valeur())
 
-'''
-    def rapport(self):
-        print ""
-        print "Solution Optimale :"
-        for j in range(self.nbvar):
-            if self.var_list[j].x == 1:
-                agent = j / self.objet_num()
-                objet = j % self.objet_num()
-                print "L'agent %d prend l'objet %d\tvaleur: %d\tvaleur max: %d" % (agent, objet, self.val_tb[agent][objet], max(self.val_tb[agent]))
-        print "Valeur de la fonction objectif : %d" % self.model.objVal
-'''
+            print valeur_table
+            t2 = time.time()
+            moy_M = 1. * np.sum(valeur_table) / n / m
+            min_M = 1. * np.min(valeur_table) / m
+            max_M = 1. * np.max(valeur_table) / m
+            t = np.round( t2 - t1 )
+            report += "\t%d\t%d\t%.2f\t%.2f\t%.2f"%(n,t,moy_M,min_M,max_M)
+            
+    md.rapport(fname, report)
 
 def ex3():
     N = [10,50,100,500,1000]
     M = [10,100,1000]
     num_iter = 10
-    
-    for m in M:
-        for n in N:
-            for i in range(num_iter):
-                model_array = []
-                model_array.append(Simple_Model(n, n, m, "model_m_eq_n_%d%d%d"%(m,n,i)))
-    
-                        
-if __name__ == "__main__":
-    sim = Simple_Model(5, 5, 10, "model_m_eq_n")
-    sim.resoudre()
-    sim.rapport()
-    print "\n\n"
-    ai = Approche_Egalitariste_MaxMin(5, 5, 10, "max_min")
-    ai.resoudre()
-    ai.rapport()
-    print "\n\n"
-    mm = Approche_Egalitariste_MaxMean(5, 5, 10, "max_mean")
-    mm.resoudre()
-    mm.rapport()
-    print "\n\n"
-    mme = Approche_Egalitariste_MaxMin_Epsilon(5, 5, 10, "max_min_epsilon")
-    mme.resoudre()
-    mme.rapport()
-    print "\n\n"
-    mr = Approche_Egalitariste_MinRegrets(5, 5, 10, "min_regrets")
-    mr.resoudre()
-    mr.rapport()
-    print "\n\n"
-    mf = Approche_Egalitariste_Max_Flow(5, 5, 10, "max_flow")
-    mf.resoudre()
-    mf.rapport()
+    fname  = "MOGPL_REPORT_Ex03.txt"
+    general_test(N,M,num_iter,fname,Simple_Model)
 
-    M_lt = [10, 100, 1000]
-    n_lt = [10, 50, 100, 500, 1000]
-    nb_tire = 10
-    for M in M_lt:
-        print "\nM: %d" % (M)
-        for n in n_lt:
-            t_lt = []
-            sol_lt = []
-            print "------------------------------------------------"
-            print "n\tt\tmoy/M\tmin/M\tmax/M"
-            print "------------------------------------------------"
-            for i in range(nb_tire):
-                sim = Simple_Model(n, n, M, "model_m_eq_n")
-                sim.resoudre()
-                sim.raport()
-                sol_lt.append(sim.get_solution_optimal())
-                t_lt.append(sim.get_runtime())
-            print "%d\t%d\t%d\t%d\t%d" % (n, sum(t_lt), np.mean(sol_lt) / M, min(sol_lt) / M, max(sol_lt) / M)
+def ex6():
+    N = [10,50,100]
+    M = [100]
+    num_iter = 10
+    fname  = "MOGPL_REPORT_Ex06.txt"
+    general_test(N,M,num_iter,fname,Approche_Egalitariste_MaxMin)
 
-    M_lt = [10, 100] # , 1000]
-    n_lt = [10, 50] # , 100 , 500, 1000]
-    nb_tirage = 1
-    for M in M_lt:
-        for n in n_lt:
-            for i in range(nb_tirage):
-                mf = Approche_Egalitariste_Max_Flow(5, 5, 10, "max_flow")
-                mf.resoudre()
-                mf.rapport()
+def ex11():
+    N = [10,50,100]
+    M = [100]
+    num_iter = 10
+    fname  = "MOGPL_REPORT_Ex11.txt"
+    general_test(N,M,num_iter,fname,Approche_Egalitariste_MinRegrets)
+    
+ex3()
+ex6()
+ex11()

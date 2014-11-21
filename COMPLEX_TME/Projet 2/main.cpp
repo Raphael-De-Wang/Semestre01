@@ -60,6 +60,17 @@ size_t testNaif(size_t max){
 	return nb;
 }
 
+vector<mpz_class> tabpremiers (mpz_class max){
+  vector<mpz_class> premiers;
+  for(size_t i = 3; i < max; i = i+2){
+    if (first_test(i)){
+      premiers.push_back(i);
+    }
+  }
+  cout << premiers;
+  return premiers;
+}
+
 size_t tempsTestNaif(mpz_class a){
 	time_t tbegin;
 	bool premier;
@@ -109,19 +120,31 @@ void plus_grand_premier_carmichael(){
 void Gen_Carmichael(mpz_class& n, mpz_class N){
   mpz_class a, b, c, prod;
   bool carmichael = false;
+  
   do{
+    my_random(a, N);
+    my_random(b, N);
+    my_random(c, N);
+  
     do{
-      my_random(a, N);
+      a += 1;
     }while(!first_test(a));
+    cout << "a: " << a ;
+    
     do{
-      my_random(b, N);
+      b += 1;
     }while(a == b || !first_test(b));
+    cout << "\tb: " << b ;
+    
     do{
-      my_random(c, N);
+      c += 1;
     }while( c == a || c == b || !first_test(c));
+    cout << "\tc: " << c << endl;
+    
     prod = a * b * c;
     if( ((prod-1) % (a-1) == 0)&& ((prod-1)%(b-1)==0) && ((prod-1)%(c-1)==0))
       carmichael = true;
+    
   } while(!carmichael);
   n = prod;
   cout << prod << endl;
@@ -179,6 +202,7 @@ int main (void){
   //cout << "TestFermat ? " << TestFermat(a);
   //cout << "RabinMiller ? " << TestRabinMiller(a);
   //plus_grand_premier_carmichael();
-  Gen_Carmichael(a, n); 
+  //Gen_Carmichael(a, n);
+  tabpremiers(a);
   return 0;
 }
