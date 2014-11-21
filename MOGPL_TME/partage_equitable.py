@@ -261,7 +261,7 @@ def general_test( N, M, num_iter, fname, Model):
     md.rapport(fname, report)
 
 def ex3():
-    N = [10,50,100,500,1000]
+    N = [10,50,100] # ,500,1000]
     M = [10,100,1000]
     num_iter = 10
     fname  = "MOGPL_REPORT_Ex03.txt"
