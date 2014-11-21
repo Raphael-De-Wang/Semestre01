@@ -110,17 +110,6 @@ class Simple_Model(Modelisation):
             self.expr += self.coe_func_obj[i] * self.var_list[i]
         self.model.setObjective(self.expr, gb.GRB.MAXIMIZE)
 
-    def rapport(self):
-        print ""
-        print "Solution Optimale :"
-        for j in range(self.nbvar):
-            if self.var_list[j].x == 1:
-                agent = j / self.objet_num()
-                objet = j % self.objet_num()
-                print "L'agent %d prend l'objet %d\tvaleur: %d\tvaleur max: %d" % (agent, objet, self.val_tb[agent][objet], max(self.val_tb[agent]))
-        print "Valeur de la fonction objectif : %d" % self.model.objVal
-
-
 class Approche_Egalitariste_MaxMin(Simple_Model):
 
     def declarer_variables(self):
@@ -227,6 +216,30 @@ class Approche_Egalitariste_Max_Flow:
             print "L'agent %d prend l'objet %d" % i
 
 
+'''
+    def rapport(self):
+        print ""
+        print "Solution Optimale :"
+        for j in range(self.nbvar):
+            if self.var_list[j].x == 1:
+                agent = j / self.objet_num()
+                objet = j % self.objet_num()
+                print "L'agent %d prend l'objet %d\tvaleur: %d\tvaleur max: %d" % (agent, objet, self.val_tb[agent][objet], max(self.val_tb[agent]))
+        print "Valeur de la fonction objectif : %d" % self.model.objVal
+'''
+
+def ex3():
+    N = [10,50,100,500,1000]
+    M = [10,100,1000]
+    num_iter = 10
+    
+    for m in M:
+        for n in N:
+            for i in range(num_iter):
+                model_array = []
+                model_array.append(Simple_Model(n, n, m, "model_m_eq_n_%d%d%d"%(m,n,i)))
+    
+                        
 if __name__ == "__main__":
     sim = Simple_Model(5, 5, 10, "model_m_eq_n")
     sim.resoudre()
