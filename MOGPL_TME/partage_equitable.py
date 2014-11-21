@@ -149,7 +149,6 @@ class Approche_Egalitariste_MaxMin(Simple_Model):
     def definir_objectif(self):
         self.model.setObjective(gb.LinExpr(self.z), gb.GRB.MAXIMIZE)
 
-
 class Approche_Egalitariste_MaxMean(Simple_Model):
 
     def declarer_variables(self):
@@ -167,7 +166,6 @@ class Approche_Egalitariste_MaxMean(Simple_Model):
     def definir_objectif(self):
         self.model.setObjective(gb.LinExpr(self.avg), gb.GRB.MAXIMIZE)
 
-
 class Approche_Egalitariste_MaxMin_Epsilon(Approche_Egalitariste_MaxMin):
 
     def __init__(self, n, m, M, model_name):
@@ -177,7 +175,6 @@ class Approche_Egalitariste_MaxMin_Epsilon(Approche_Egalitariste_MaxMin):
     def definir_objectif(self):
         self.model.setObjective(gb.LinExpr(
             self.z + self.epsilon * self.formule_solution_optimale()), gb.GRB.MAXIMIZE)
-
 
 class Approche_Egalitariste_MinRegrets(Simple_Model):
 
@@ -195,7 +192,6 @@ class Approche_Egalitariste_MinRegrets(Simple_Model):
 
     def definir_objectif(self):
         self.model.setObjective(gb.LinExpr(self.regrets), gb.GRB.MINIMIZE)
-
 
 class Approche_Egalitariste_Max_Flow:
 
@@ -255,7 +251,6 @@ def general_test( N, M, num_iter, fname, Model):
                 md.resoudre()
                 valeur_table.append(md.agent_prend_valeur())
 
-            print valeur_table
             t2 = time.time()
             moy_M = 1. * np.sum(valeur_table) / n / m
             min_M = 1. * np.min(valeur_table) / m
