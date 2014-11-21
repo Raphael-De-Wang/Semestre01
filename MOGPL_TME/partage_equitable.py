@@ -170,9 +170,6 @@ class Approche_Egalitariste_MaxMin_Epsilon(Approche_Egalitariste_MaxMin):
 
 class Approche_Egalitariste_MinRegrets(Simple_Model):
 
-    def __init__(self, n, m, M, model_name):
-        Simple_Model.__init__(self, n, m, M, model_name)
-
     def declarer_variables(self):
         self.var_list = [self.model.addVar(
             vtype=gb.GRB.BINARY, name="x%d" % i) for i in range(self.nbvar)]

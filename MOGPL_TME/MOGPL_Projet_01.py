@@ -41,6 +41,8 @@ class Modelisation :
 
     def definir_objectif(self):
         raise Exception(NotImplemented)
+
+    def callback(self):
         
     def resoudre(self):
         self.model.optimize()
