@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg width="1086" height="603" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g style="stroke:black;fill:lightgreen" transform="translate(30,30)">
+<line x1="65" y1="354" x2="65" y2="422" style="stroke:blue; stroke-width:1"/>
+<line x1="65" y1="422" x2="78" y2="422" style="stroke:blue; stroke-width:1"/>
+<line x1="65" y1="354" x2="65" y2="286" style="stroke:blue; stroke-width:1"/>
+<line x1="65" y1="286" x2="77" y2="286" style="stroke:blue; stroke-width:1"/>
+<line x1="16" y1="353" x2="16" y2="557" style="stroke:blue; stroke-width:1"/>
+<line x1="16" y1="557" x2="920" y2="557" style="stroke:blue; stroke-width:1"/>
+<line x1="19" y1="84" x2="19" y2="151" style="stroke:blue; stroke-width:1"/>
+<line x1="19" y1="151" x2="78" y2="151" style="stroke:blue; stroke-width:1"/>
+<line x1="19" y1="84" x2="19" y2="16" style="stroke:blue; stroke-width:1"/>
+<line x1="19" y1="16" x2="65" y2="16" style="stroke:blue; stroke-width:1"/>
+<line x1="16" y1="353" x2="16" y2="354" style="stroke:blue; stroke-width:1"/>
+<line x1="16" y1="354" x2="65" y2="354" style="stroke:blue; stroke-width:1"/>
+<line x1="16" y1="353" x2="16" y2="84" style="stroke:blue; stroke-width:1"/>
+<line x1="16" y1="84" x2="19" y2="84" style="stroke:blue; stroke-width:1"/>
+<text x="924" y="564" font-weight = "10" font-family="verdana" fill="black" font-size="18">sp|P90925|</text>
+<text x="82" y="429" font-weight = "10" font-family="verdana" fill="black" font-size="18">sp|P16331|</text>
+<text x="81" y="293" font-weight = "10" font-family="verdana" fill="black" font-size="18">sp|P04176|</text>
+<text x="82" y="158" font-weight = "10" font-family="verdana" fill="black" font-size="18">sp|Q2KIH7|</text>
+<text x="69" y="23" font-weight = "10" font-family="verdana" fill="black" font-size="18">sp|P00439|</text>
+</g></svg>

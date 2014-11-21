@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg width="1086" height="603" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g style="stroke:black;fill:lightgreen" transform="translate(30,30)">
+<line x1="250" y1="354" x2="250" y2="422" style="stroke:blue; stroke-width:1"/>
+<line x1="250" y1="422" x2="336" y2="422" style="stroke:blue; stroke-width:1"/>
+<line x1="250" y1="354" x2="250" y2="286" style="stroke:blue; stroke-width:1"/>
+<line x1="250" y1="286" x2="336" y2="286" style="stroke:blue; stroke-width:1"/>
+<line x1="316" y1="84" x2="316" y2="151" style="stroke:blue; stroke-width:1"/>
+<line x1="316" y1="151" x2="336" y2="151" style="stroke:blue; stroke-width:1"/>
+<line x1="316" y1="84" x2="316" y2="16" style="stroke:blue; stroke-width:1"/>
+<line x1="316" y1="16" x2="336" y2="16" style="stroke:blue; stroke-width:1"/>
+<line x1="128" y1="388" x2="128" y2="557" style="stroke:blue; stroke-width:1"/>
+<line x1="128" y1="557" x2="920" y2="557" style="stroke:blue; stroke-width:1"/>
+<line x1="239" y1="219" x2="239" y2="354" style="stroke:blue; stroke-width:1"/>
+<line x1="239" y1="354" x2="250" y2="354" style="stroke:blue; stroke-width:1"/>
+<line x1="239" y1="219" x2="239" y2="84" style="stroke:blue; stroke-width:1"/>
+<line x1="239" y1="84" x2="316" y2="84" style="stroke:blue; stroke-width:1"/>
+<line x1="128" y1="388" x2="128" y2="219" style="stroke:blue; stroke-width:1"/>
+<line x1="128" y1="219" x2="239" y2="219" style="stroke:blue; stroke-width:1"/>
+<line x1="16" y1="388" x2="16" y2="388" style="stroke:blue; stroke-width:1"/>
+<line x1="16" y1="388" x2="128" y2="388" style="stroke:blue; stroke-width:1"/>
+<text x="20" y="385" font-weight = "10" font-family="verdana" fill="black" font-size="18">Root</text>
+<text x="924" y="564" font-weight = "10" font-family="verdana" fill="black" font-size="18">sp|P90925|</text>
+<text x="340" y="429" font-weight = "10" font-family="verdana" fill="black" font-size="18">sp|P00439|</text>
+<text x="340" y="293" font-weight = "10" font-family="verdana" fill="black" font-size="18">sp|Q2KIH7|</text>
+<text x="340" y="158" font-weight = "10" font-family="verdana" fill="black" font-size="18">sp|P16331|</text>
+<text x="340" y="23" font-weight = "10" font-family="verdana" fill="black" font-size="18">sp|P04176|</text>
+</g></svg>
