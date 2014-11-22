@@ -22,19 +22,11 @@ def valeurs_table_aleatoire(n, m, M):
 
 # classe abstraite
 class Modelisation:
-
-    def __init__(self, contr_a, contr_b, coe_func_obj, model_name):
-
-        if len(np.shape(contr_a)) == 1:
-            self.contr_a = [contr_a]
-        else:
-            self.contr_a = contr_a
-
-        self.contr_b = contr_b
+    
+    def __init__(self, coe_func_obj, model_name):
         self.coe_func_obj = coe_func_obj
         self.model_name = model_name
         self.model = gb.Model(self.model_name)
-        self.nbcont = len(self.contr_a)
         self.nbvar = len(self.coe_func_obj)
         self.var_list = []
         self.expr = gb.LinExpr()
@@ -43,6 +35,12 @@ class Modelisation:
         self.definir_objectif()
         self.definir_contraintes()
 
+    def contr_a(self, ligne, colone):
+        raise Exception(NotImplemented)
+
+    def contr_b(self, i):
+        raise Exception(NotImplemented)
+        
     def declarer_variables(self):
         raise Exception(NotImplemented)
 
@@ -74,15 +72,24 @@ class Simple_Model(Modelisation):
     def __init__(self, n, m, M, model_name):
         self.val_tb = valeurs_table_aleatoire(n, m, M)
         self.val_tb_shape = (n, m)
-        contr_a = np.zeros((n + m, n * m))
-        for i in range(n):
-            contr_a[i, i * m:(i + 1) * m] = 1
-            for j in range(m):
-                contr_a[n + j, i * m + j] = 1
-        contr_b = np.ones(n + m)
+        self.nbcont = n + m
         coe_func_obj = [val for i, ligne in enumerate(self.val_tb) for j, val in enumerate(ligne)]
-        Modelisation.__init__(self, contr_a, contr_b, coe_func_obj, model_name)
+        Modelisation.__init__(self, coe_func_obj, model_name)
 
+    def contr_a(self, ligne, colone):
+        (n, m) = self.val_tb_shape
+        if 0 <= ligne and ligne < n:
+            if colone >= ligne * m and colone < (ligne + 1) * m :
+                return 1
+        elif 0 <= ligne and ligne < m + n:
+            if ( colone - ( ligne - n ) ) % m == 0:
+                return 1
+        return 0
+            
+    def contr_b(self, i):
+        if 0 <= i and i < self.nbcont:
+            return 1
+        
     def agent_num(self):
         return self.val_tb_shape[0]
 
@@ -90,13 +97,13 @@ class Simple_Model(Modelisation):
         return self.val_tb_shape[1]
 
     def formule_solution_optimale(self):
-        return gb.quicksum([self.contr_a[i][j] * self.var_list[j] * self.val_tb[i][j % self.objet_num()] for i in range(self.nbcont) for j in range(self.nbvar) if i < self.agent_num()])
+        return gb.quicksum([self.contr_a(i,j) * self.var_list[j] * self.val_tb[i][j % self.objet_num()] for i in range(self.nbcont) for j in range(self.nbvar) if i < self.agent_num()])
 
     def formule_agent_solution_optimale(self, agent):
         if agent >= self.agent_num():
             raise Exception("Erreur: L'agent %d n'existe pas." % agent)
 
-        return gb.quicksum([self.contr_a[agent][j] * self.var_list[j] * self.val_tb[agent][j % self.objet_num()] for j in range(self.nbvar)])
+        return gb.quicksum([self.contr_a(agent,j) * self.var_list[j] * self.val_tb[agent][j % self.objet_num()] for j in range(self.nbvar)])
 
     def declarer_variables(self):
         self.var_list = [self.model.addVar(
@@ -105,7 +112,7 @@ class Simple_Model(Modelisation):
 
     def definir_contraintes(self):
         for i in range(self.nbcont):
-            self.model.addConstr(gb.quicksum([self.contr_a[i][j] * self.var_list[j] for j in range(self.nbvar)]) <= self.contr_b[i], "Contrainte%d" % (i))
+            self.model.addConstr(gb.quicksum([self.contr_a(i,j) * self.var_list[j] for j in range(self.nbvar)]) <= self.contr_b(i), "Contrainte%d" % (i))
 
     def definir_objectif(self):
         for i in range(self.nbvar):
@@ -116,9 +123,9 @@ class Simple_Model(Modelisation):
         obj_lst = []
         for j in range(self.nbvar):
             if self.var_list[j].x == 1:
-                # agent = j / self.objet_num()
+                agent = j / self.objet_num()
                 objet = j % self.objet_num()
-                # print "L'agent %d prend l'objet %d\tvaleur: %d\tvaleur max: %d" % (agent, objet, self.val_tb[agent][objet], max(self.val_tb[agent]))
+                print "L'agent %d prend l'objet %d\tvaleur: %d\tvaleur max: %d" % (agent, objet, self.val_tb[agent][objet], max(self.val_tb[agent]))
                 obj_lst.append(objet)
         return obj_lst
 
@@ -142,9 +149,9 @@ class Approche_Egalitariste_MaxMin(Simple_Model):
 
     def definir_contraintes(self):
         for i in range(self.nbcont):
-            self.model.addConstr(gb.quicksum([self.contr_a[i][j] * self.var_list[j] for j in range(self.nbvar)]) <= self.contr_b[i], "Contrainte%d" % (i))
+            self.model.addConstr(gb.quicksum([self.contr_a(i,j) * self.var_list[j] for j in range(self.nbvar)]) <= self.contr_b(i), "Contrainte%d" % (i))
             if i < self.agent_num():
-                self.model.addConstr(self.z <= gb.quicksum([self.contr_a[i][j] * self.var_list[j] * self.val_tb[i][j % self.objet_num()] for j in range(self.nbvar)]), "Contrainte%d.2" % (i))
+                self.model.addConstr(self.z <= gb.quicksum([self.contr_a(i,j) * self.var_list[j] * self.val_tb[i][j % self.objet_num()] for j in range(self.nbvar)]), "Contrainte%d.2" % (i))
 
     def definir_objectif(self):
         self.model.setObjective(gb.LinExpr(self.z), gb.GRB.MAXIMIZE)
@@ -159,7 +166,7 @@ class Approche_Egalitariste_MaxMean(Simple_Model):
 
     def definir_contraintes(self):
         for i in range(self.nbcont):
-            self.model.addConstr(gb.quicksum([self.contr_a[i][j] * self.var_list[j] for j in range(self.nbvar)]) <= self.contr_b[i], "Contrainte%d" % (i))
+            self.model.addConstr(gb.quicksum([self.contr_a(i,j) * self.var_list[j] for j in range(self.nbvar)]) <= self.contr_b(i), "Contrainte%d" % (i))
 
         self.model.addConstr(self.avg <= self.formule_solution_optimale() / self.agent_num(), "Contrainte%d" % (i + 1))
 
@@ -186,7 +193,7 @@ class Approche_Egalitariste_MinRegrets(Simple_Model):
 
     def definir_contraintes(self):
         for i in range(self.nbcont):
-            self.model.addConstr(gb.quicksum([self.contr_a[i][j] * self.var_list[j] for j in range(self.nbvar)]) <= self.contr_b[i], "Contrainte%d" % (i))
+            self.model.addConstr(gb.quicksum([self.contr_a(i,j) * self.var_list[j] for j in range(self.nbvar)]) <= self.contr_b(i), "Contrainte%d" % (i))
             if i < self.agent_num():
                 self.model.addConstr(self.regrets >= max(self.val_tb[i]) - self.formule_agent_solution_optimale(i), "Contrainte%d.2" % (i))
 
@@ -259,7 +266,8 @@ def general_test( N, M, num_iter, fname, Model):
             report += "\t%d\t%d\t%.2f\t%.2f\t%.2f"%(n,t,moy_M,min_M,max_M)
             
     md.rapport(fname, report)
-
+    md.agent_prend_objet()
+    
 def ex3():
     N = [10,50,100] # ,500,1000]
     M = [10,100,1000]
@@ -280,7 +288,9 @@ def ex11():
     num_iter = 10
     fname  = "MOGPL_REPORT_Ex11.txt"
     general_test(N,M,num_iter,fname,Approche_Egalitariste_MinRegrets)
-    
-ex3()
-ex6()
-ex11()
+
+if __name__ == '__main__':
+    ex3()
+    ex6()
+    ex11()
+
