@@ -252,7 +252,7 @@ def general_test( N, M, num_iter, fname, Model):
                 valeur_table.append(md.agent_prend_valeur())
 
             t2 = time.time()
-            moy_M = 1. * np.sum(valeur_table) / n / m
+            moy_M = 1. * np.sum(valeur_table) / n / num_iter / m
             min_M = 1. * np.min(valeur_table) / m
             max_M = 1. * np.max(valeur_table) / m
             t = np.round( t2 - t1 )
