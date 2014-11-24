@@ -245,17 +245,21 @@ def general_test( N, M, num_iter, fname, Model):
     report = "Resultat: \n"
     
     for m in M:
+        report += "\n\n[ M = %d ]\n"%(m)
+        report += "---------------------------------------------------------------\n"
+        report += "\tn\tt\tmoy/M\tmin/M\tmax/M\n"
+        report += "---------------------------------------------------------------\n"
         for n in N:
             valeur_table = []
-            report += "\n\n[ M = %d ]\n"%(m)
-            report += "---------------------------------------------------------------\n"
-            report += "\tn\tt\tmoy/M\tmin/M\tmax/M\n"
-            report += "---------------------------------------------------------------\n"
             t1 = time.time()
             
             for i in range(num_iter):
+                t_md        = time.time()
                 md = Model(n, n, m, "model_m_eq_n_%d%d%d"%(m,n,i))
+                t_md       -= time.time()
+                t_resoudre  = time.time()
                 md.resoudre()
+                t_resoudre -= time.time()
                 valeur_table.append(md.agent_prend_valeur())
 
             t2 = time.time()
@@ -269,28 +273,33 @@ def general_test( N, M, num_iter, fname, Model):
     md.agent_prend_objet()
     
 def ex3():
-    N = [10,50,100] # ,500,1000]
-    M = [10,100,1000]
+    N        = [10,50,100] # ,500,1000]
+    M        = [10,100,1000]
     num_iter = 10
-    fname  = "MOGPL_REPORT_Ex03.txt"
+    fname    = "MOGPL_REPORT_Ex03.txt"
     general_test(N,M,num_iter,fname,Simple_Model)
 
 def ex6():
-    N = [10,50,100]
-    M = [100]
+    N        = [10,50,100]
+    M        = [100]
     num_iter = 10
-    fname  = "MOGPL_REPORT_Ex06.txt"
+    fname    = "MOGPL_REPORT_Ex06.txt"
     general_test(N,M,num_iter,fname,Approche_Egalitariste_MaxMin)
 
-def ex11():
-    N = [10,50,100]
-    M = [100]
+def ex8():
+    N        = [10,50,100]
+    M        = [100]
     num_iter = 10
-    fname  = "MOGPL_REPORT_Ex11.txt"
+    fname    = "MOGPL_REPORT_Ex08.txt"
+    general_test(N,M,num_iter,fname,Approche_Egalitariste_MaxMin_Epsilon)
+    
+def ex11():
+    N        = [10,50,100]
+    M        = [100]
+    num_iter = 10
+    fname    = "MOGPL_REPORT_Ex11.txt"
     general_test(N,M,num_iter,fname,Approche_Egalitariste_MinRegrets)
 
 if __name__ == '__main__':
-    ex3()
-    ex6()
-    ex11()
+    ex8()
 
