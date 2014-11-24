@@ -254,12 +254,8 @@ def general_test( N, M, num_iter, fname, Model):
             t1 = time.time()
             
             for i in range(num_iter):
-                t_md        = time.time()
                 md = Model(n, n, m, "model_m_eq_n_%d%d%d"%(m,n,i))
-                t_md       -= time.time()
-                t_resoudre  = time.time()
                 md.resoudre()
-                t_resoudre -= time.time()
                 valeur_table.append(md.agent_prend_valeur())
 
             t2 = time.time()
