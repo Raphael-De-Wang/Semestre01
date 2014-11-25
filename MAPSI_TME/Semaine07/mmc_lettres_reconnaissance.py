@@ -37,23 +37,26 @@ def learnHMM(allx, allq, N, K, initTo0=False):
         raise Exception("Invalid Data")
         
     if initTo0:
-        A = np.zeros((N,N))
-        B = np.zeros((N,K))
+        A  = np.zeros((N,N))
+        B  = np.zeros((N,K))
         Pi = np.zeros(N)
     else:
         eps = 1e-8
-        A = np.ones((N,N))*eps
-        B = np.ones((N,K))*eps
+        A  = np.ones((N,N))*eps
+        B  = np.ones((N,K))*eps
         Pi = np.ones(N)*eps
 
     for i in range(len(allx)):
         lettre   = allx[i]
         etat_seq = allq[i]
         Pi[etat_seq[0]] += 1
+        
         for j in range( len(lettre) - 1 ):
             begin = etat_seq[j]
             to    = etat_seq[j+1]
             A[begin,to] += 1
+            
+        for j in range( len(lettre) ):
             n = etat_seq[j]
             k = lettre[j]
             B[n,k] += 1
@@ -61,42 +64,62 @@ def learnHMM(allx, allq, N, K, initTo0=False):
     A /= np.maximum(A.sum(1).reshape(N,1),1)
     B /= np.maximum(B.sum(1).reshape(N,1),1)
     Pi/= Pi.sum()
+
     return Pi, A, B
 
 Pi, A, B = learnHMM( Xd[Y=='a'], q[Y=='a'], N, K)
 
-def delta(x,Pi,A,B):
+def __psi(delta_t_1, A):
+    return [ np.argmax(np.log(A[:,j]) + delta_t_1) for j in range(N) ]
+
+def __delta(delta_t_1, x, A, B, N):
+    return np.array([np.max(np.log(A[:,j]) + delta_t_1) + np.log(B[j,x[-1]]) for j in range(N)])
+    
+def delta(x,Pi,A,B,N):
     if len(x) == 1:
-        return np.log(Pi) + np.log(B[:,x[0]]), [[ -1 for i in range(len(Pi)) ]]
+        return np.log(Pi) + np.log(B[:,x[-1]]), [np.array([-1 for i in range(len(Pi))])]
         
-    dt_1, phi_table = delta(x[:-1],Pi,A,B)
-    i = np.argmax(dt_1)
+    dt_1, psi_table = delta(x[:-1],Pi,A,B,N)
     
-    return np.max(dt_1[i] + np.log(A[i])) + np.log(B[:,x[-1]]) , [] # phi_table.append(phi(dt_1,A,i))
-
-def phi(delt_1,A,i):
-    return np.argmax(delt_1 + np.log(A[i]))
-
-def chemin(delt_list, S):
-    return 0
+    psi_table.append(__psi(dt_1,A))
     
+    return __delta(dt_1, x, A, B, N), psi_table
+
 def viterbi(x,Pi,A,B):
     # 2. Récursion:
-    delta_t, phi_table = delta(x,Pi,A,B)
-    
+    delta_t, psi_table = delta(x,Pi,A,B,len(Pi))
+    psi_table = np.array(psi_table)
+    delta_t   = np.array(delta_t)
+
     # 3. Terminasion:
     p_est = max(delta_t)
 
     # 4. Chemin
-    #    print phi_list
-    # s_est = chemin(delt_list, S)
-    return p_est
+    T = len(x)
+    s_est = np.zeros(T)
+    s_est[T-1] = np.argmax(delta_t)
+
+    for t in range(T-2, -1, -1):
+        s_est[t] = psi_table[t+1, s_est[t+1]]
+
+    return p_est, s_est
 
 print viterbi(Xd[0],Pi,A,B)
+
+def methode_alpha(x, Pi, A, B):
+    N = len(Pi)
+    if len(x) == 1:
+        return Pi * B[:,x[-1]]
+        
+    alpha_t_1 = methode_alpha(x[:-1], Pi, A, B)
+    return [ sum( alpha_t_1 * A[:,j] ) + B[j,x[-1]] for j in range(N) ]
+
+def calc_log_probs_v2(x, Pi, A, B):
+    return np.log(sum(methode_alpha(x, Pi, A, B)))
+
+print calc_log_probs_v2(Xd[0], Pi, A, B)
     
 '''
-def calc_log_pobs_v2(x,Pi, A, B):
-    
 def baum_welch_simplifie():
 
 def separeTrainTest(y, pc):
