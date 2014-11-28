@@ -195,28 +195,28 @@ class Approche_Egalitariste_Max_Flow:
 def ex3():
     N        = [10,50,100,500,1000]
     M        = [10,100,1000]
-    num_iter = 1
+    num_iter = 10
     fname    = "MOGPL_REPORT_Ex03.txt"
     general_test(N,M,num_iter,fname,Simple_Model)
 
 def ex6():
     N        = [10,50,100]
     M        = [100]
-    num_iter = 1
+    num_iter = 10
     fname    = "MOGPL_REPORT_Ex06.txt"
     general_test(N,M,num_iter,fname,Approche_Egalitariste_MaxMin)
 
 def ex8():
     N        = [10,50,100]
     M        = [100]
-    num_iter = 1
+    num_iter = 10
     fname    = "MOGPL_REPORT_Ex08.txt"
     general_test(N,M,num_iter,fname,Approche_Egalitariste_MaxMin_Epsilon)
     
 def ex11():
     N        = [10,50,100]
     M        = [100]
-    num_iter = 1
+    num_iter = 10
     fname    = "MOGPL_REPORT_Ex11.txt"
     general_test(N,M,num_iter,fname,Approche_Egalitariste_MinRegrets)
 
@@ -237,8 +237,10 @@ def general_test( N, M, num_iter, fname, Model):
                 md.resoudre()
                 obj_list = md.solution()
                 valeur_table.append(obj_list[:,1])
+                '''
                 for agent, ov in enumerate(obj_list):
                     print "Agent %d prend Objet: %d Valeur: %d"%(agent,ov[0],ov[1])
+                '''
             t2 = time.time()
             moy_M = 1. * np.sum(valeur_table) / n / num_iter / m
             min_M = 1. * np.min(valeur_table) / m

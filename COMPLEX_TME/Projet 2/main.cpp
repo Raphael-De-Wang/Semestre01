@@ -1,6 +1,8 @@
 #include <iostream>
+#include <cstdlib>
 #include <gmpxx.h>
 #include <ctime>
+#include <vector>
 
 /*export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib*/
 using namespace std;
@@ -11,9 +13,6 @@ void my_random(mpz_class& destination, mpz_class borne){
   gmp_randseed_ui(gmpRandState, time(0));
   mpz_urandomm(destination.get_mpz_t(), gmpRandState, borne.get_mpz_t());
 }
-
-
-
 
 void my_pgcd(mpz_class a, mpz_class b, mpz_class& pgcd){
 	if(b > a){
@@ -60,14 +59,13 @@ size_t testNaif(size_t max){
 	return nb;
 }
 
-vector<mpz_class> tabpremiers (mpz_class max){
+vector<mpz_class> generer_premiers (mpz_class max){
   vector<mpz_class> premiers;
   for(size_t i = 3; i < max; i = i+2){
     if (first_test(i)){
       premiers.push_back(i);
     }
   }
-  cout << premiers;
   return premiers;
 }
 
@@ -118,39 +116,38 @@ void plus_grand_premier_carmichael(){
 }
 
 void Gen_Carmichael(mpz_class& n, mpz_class N){
-  mpz_class a, b, c, prod;
-  bool carmichael = false;
-  
-  do{
-    my_random(a, N);
-    my_random(b, N);
-    my_random(c, N);
-  
+  vector<mpz_class> premiers; 
+  mpz_class a, b, c;
+  int alea;
+  bool carmichael(false);
+  premiers = generer_premiers(N);
+  while( ! carmichael){
+    alea = rand() % premiers.size();
+    a = premiers[alea];
     do{
-      a += 1;
-    }while(!first_test(a));
-    cout << "a: " << a ;
-    
+      alea = rand() % premiers.size();
+      b = premiers[alea];
+    }while(b == a);
     do{
-      b += 1;
-    }while(a == b || !first_test(b));
-    cout << "\tb: " << b ;
+      alea = rand() % premiers.size();
+      c = premiers[alea];
+    }while(b == a || c == a);
     
-    do{
-      c += 1;
-    }while( c == a || c == b || !first_test(c));
-    cout << "\tc: " << c << endl;
-    
-    prod = a * b * c;
-    if( ((prod-1) % (a-1) == 0)&& ((prod-1)%(b-1)==0) && ((prod-1)%(c-1)==0))
+    n = a * b * c;
+    if (((n-1) % (a - 1) == 0) && ((n-1) % (b - 1) == 0) && ((n-1) % (c - 1) == 0))
       carmichael = true;
-    
-  } while(!carmichael);
-  n = prod;
-  cout << prod << endl;
-  //return a*b*c;
+  }
 }
-//return true if prime
+
+void TestCarmichael(){
+  int nb = 0;
+  for(int i = 3; i < 100000; i++){
+    if (Is_Carmichael(i))
+      nb ++;
+  }
+  cout << nb << endl;
+}
+
 bool TestFermat(mpz_class N){
   mpz_class a(0);
   N = N - 1;
@@ -203,6 +200,8 @@ int main (void){
   //cout << "RabinMiller ? " << TestRabinMiller(a);
   //plus_grand_premier_carmichael();
   //Gen_Carmichael(a, n);
-  tabpremiers(a);
+  //Gen_Carmichael(a, n);
+  //cout << "Carmichael : " << a << endl;
+  TestCarmichael();
   return 0;
 }
