@@ -4,13 +4,14 @@
 #define FALSE 0
 #define FREE(ptr) if ( (ptr) != NULL ) { free(ptr); ptr = NULL; }
 
-
 /** Exercice 6 Arithmetique dans Zn **/
 void my_pgcd(mpz_t rop, mpz_t op1, mpz_t op2);
 int my_inverse(mpz_t b, mpz_t a, mpz_t N);
-void expo_mod(mpz_t exp, mpz_t m, mpz_t e, mpz_t N);
+void expo_mod(mpz_t rop, mpz_t m, mpz_t e, mpz_t N);
 
 /** Exercice 7 Test Naif **/
+int first_test(mpz_t N);
+void naif_premier_compteur(mpz_t numbre, mpz_t interval);
 
 /** Exercice 8 Nombres de Carmichael **/
 
