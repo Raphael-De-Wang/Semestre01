@@ -45,6 +45,21 @@ void test_premier_compteur (void) {
   FREE(str_num);
 }
 
+
+void test_plus_grand_entier(void) {
+  int   sec       = 60;
+  char *borne_str = NULL;
+  mpz_t borne;
+  
+  puts("---- Q 7.3  plus grand entier qu'on peut tester ----");  
+  mpz_init_set_str(borne, "0", BASE);
+  plus_grand_entier_TestNaif(borne, sec);
+  printf("Le premier grand nombre que la fonction first_test ne peut pas tester en %d secondes:%s \n", sec, mpz_get_str(borne_str, BASE, borne));
+  
+  mpz_clear(borne);
+  FREE(borne_str);
+}
+
 int main( int argc, char *argv[]) {
   puts("==== Exercise 7 Test Naif ====");
 
@@ -57,6 +72,7 @@ int main( int argc, char *argv[]) {
       test_premier_compteur ();
       break;
     case '3':
+      test_plus_grand_entier ();
       break;
     default:
       break;

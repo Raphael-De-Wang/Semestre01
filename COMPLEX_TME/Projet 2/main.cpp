@@ -50,8 +50,8 @@ bool first_test(mpz_class n){
 }
 
 size_t testNaif(size_t max){
-	size_t nb = 0; 
-	for(int i = 2; i < max; i++){
+	size_t nb = 0;
+	for(unsigned int i = 3; i < max ; i+=2){
 		if (first_test(i)){
 			nb ++;
 		}
@@ -68,20 +68,21 @@ vector<mpz_class> generer_premiers (mpz_class max){
   }
   return premiers;
 }
-
+/*
 size_t tempsTestNaif(mpz_class a){
 	time_t tbegin;
 	bool premier;
+	do{
 	tbegin=time(NULL);
 	premier = first_test(a);
 	cout << "temps : " << difftime(time(NULL), tbegin) << "sec"<< "premier ? "<<premier;
-}
+	}*/
 
 void plus_grand_premier_naif(){
   time_t tbegin;
-  mpz_class a(2), prime; 
-  tbegin = time(NULL);
+  mpz_class a(10000000), prime; 
   do{
+    tbegin = time(NULL);
     if(first_test(a)){
       prime = a;;
     }
@@ -89,7 +90,7 @@ void plus_grand_premier_naif(){
   }while( difftime(time(NULL), tbegin) < 60 );
   cout << prime << endl;
 }
-
+/*
 bool Is_Carmichael(mpz_class n){
   mpz_class p = 2, gcd, em, n2;
   do{
@@ -100,7 +101,44 @@ bool Is_Carmichael(mpz_class n){
   mpz_powm(em.get_mpz_t(), p.get_mpz_t(), n2.get_mpz_t(), n.get_mpz_t());
   return em == 1;
 }
+*/
 
+
+bool Is_Carmichael(mpz_class N){
+  bool flag(true);
+  int i(0), nb_fac(3);
+  int len_div = nb_fac + 1;
+  mpz_class k(0), r(0), N_1(0), un(1);
+  vector<mpz_class> div;
+  for ( i = 0; i < len_div ; i++) {
+    div.push_back(2);
+  }
+  /** factoriser **/
+  i = 0;
+  mpz_sqrt (k.get_mpz_t(), N.get_mpz_t());
+  while ( i < len_div  && mpz_cmp(div[i].get_mpz_t(),k.get_mpz_t()) <= 0 ) {
+    mpz_mod (r.get_mpz_t(), N.get_mpz_t(), div[i].get_mpz_t());
+    if (r  == 0 ) {
+      div[i+1] = div[i];
+      i += 1;
+    }
+    mpz_nextprime (div[i].get_mpz_t(), div[i].get_mpz_t());
+  }
+  /** verification **/
+  if ( i == nb_fac ) {
+    N_1 = N - un;
+    for (i = 0; i < nb_fac; i++) {
+      div[i] =  div[i]- un;
+      mpz_mod (r.get_mpz_t(), N_1.get_mpz_t(), div[i].get_mpz_t());
+      if (r != 0 ) {
+	flag = false;
+      }
+    }
+  } else {
+    flag = false;
+  }
+  return flag;
+}
 
 void plus_grand_premier_carmichael(){
   time_t tbegin;
@@ -141,9 +179,11 @@ void Gen_Carmichael(mpz_class& n, mpz_class N){
 
 void TestCarmichael(){
   int nb = 0;
-  for(int i = 3; i < 100000; i++){
-    if (Is_Carmichael(i))
+  for(int i = 3; i < 100000; i+=2){
+    if (Is_Carmichael(i)){
       nb ++;
+      cout << i << endl;
+    }
   }
   cout << nb << endl;
 }
@@ -191,10 +231,10 @@ int main (void){
   //testPGCD();
   //cout << "nombre de premiers inferieur a 100 000 : " << testNaif(100000) << endl;
   //tempsTestNaif(a);
-  mpz_class a, n;
-
-  cout << "tirage dans : ";
-  cin >> n;
+  //mpz_class a, n;
+  //plus_grand_premier_naif();
+  //cout << "tirage dans : ";
+  //cin >> n;
   //cout << "Carmichael ? " << Is_Carmichael(a);
   //cout << "TestFermat ? " << TestFermat(a);
   //cout << "RabinMiller ? " << TestRabinMiller(a);
