@@ -89,7 +89,7 @@ void  test_plus_grand_entier_CallBack(void(*CallBack)(mpz_t, int)) {
   
   puts("Tester en secondes : ");
   scanf("%d", &sec);
-  mpz_init_set_str(borne, "68000000000000000", BASE);
+  mpz_init_set_str(borne, "1000000", BASE);
   CallBack(borne, sec);
   printf("Le premier grand nombre que la fonction ne peut pas tester en %d secondes:%s \n", sec, mpz_get_str(borne_str, BASE, borne));
   
@@ -104,7 +104,7 @@ void test_plus_grand_entier_trouve_CallBack(void(*CallBack)(mpz_t, int)) {
     
   puts("Tester en secondes : ");
   scanf("%d",&sec);
-  mpz_init(borne);
+  mpz_init_set_str(borne, "2", BASE);
   CallBack(borne, sec);
   printf("Le plus grand nombre que la fonction a trouve en %d secondes: %s \n", sec, mpz_get_str(str, BASE, borne));
 
@@ -114,18 +114,14 @@ void test_plus_grand_entier_trouve_CallBack(void(*CallBack)(mpz_t, int)) {
 
 void  probs_erreur(mpf_t probs, const mpz_t borne, int (*CallBack)(const mpz_t)) {
   mpz_t N;
-  //mpf_t premier;
-  mpf_t borne_f;
-  mpf_t echec;
+  mpf_t borne_f, echec;
   char *str = NULL;
-
   
   mpf_inits(borne_f,echec,NULL);
   mpz_init_set_str(N,"2",BASE);
   
   while ( mpz_cmp ( N, borne ) < 0 ) {
     if (CallBack(N)) {
-      //mpf_add_ui(premier,premier,1);
       if (!first_test(N)) {
 	mpf_add_ui(echec,echec,1);	
       }
@@ -245,7 +241,6 @@ int Is_Carmichael_Facteuriser(mpz_t div[], int len_div, const mpz_t N) {
   mpz_t k, r;
   
   mpz_inits(k,r,NULL);
-  gmp_printf("%Zu",N);
   mpz_sqrt(k, N);
   
   while ( mpz_cmp(div[i],k) <= 0 ) {
@@ -361,8 +356,9 @@ mpz_t** lister_nombres_carmichael(const mpz_t borne, int len) {
       carmichaels[i] = (mpz_t *)malloc(sizeof(mpz_t));
       mpz_init(*carmichaels[i]);
       mpz_set(*carmichaels[i], N);
+      i++;
     }
-    mpz_sub_ui(N, N, 1);
+    mpz_add_ui(N, N, 1);
   }
   
   mpz_clear(N);
@@ -418,7 +414,6 @@ int TestRabinMiller(const mpz_t N) {
   mp_bitcnt_t i, s = 0;
   mpz_t N_1, reste, a, r;
   
-  
   mpz_inits( N_1, reste, a, r, NULL);
   mpz_sub_ui(N_1, N, 1);
   
@@ -431,7 +426,6 @@ int TestRabinMiller(const mpz_t N) {
       break;
     }
   }
-  // gmp_printf("a:%Zu\tr:%Zu\treste:%Zu\n", a, r, reste);
   
   if ( s > 0 ) {
     mpz_fdiv_q_2exp (r, N_1, s);
@@ -440,14 +434,11 @@ int TestRabinMiller(const mpz_t N) {
       random_nombre_m(a, N_1);
     } while ( mpz_cmp_si(a,2) < 0 );
     
-    gmp_printf("a:%Zu\tr:%Zu\treste:%Zu\n", a, r, reste);
     mpz_powm_sec(reste, a, r, N);
-    gmp_printf("a:%Zu\tr:%Zu\treste:%Zu\n", a, r, reste);    
     if ( mpz_cmp_si(reste,1) != 0 && mpz_cmp(reste,N_1) != 0 ) {
       
       for ( i = 1; i <= s - 1; i++ ) {
 	mpz_powm_ui (reste, reste, 2, N);
-	gmp_printf("a:%Zu\tr:%Zu\treste:%Zu\n", a, r, reste);
 	if (mpz_cmp_ui(reste,1) == 0) {
 	  flag = FALSE;
 	  break;
@@ -487,11 +478,11 @@ void GenPKRSA(mpz_t N, int t) {
   random_nombre_b(q, t);
   
   while ( !TestFermat(p) && !TestRabinMiller(p)) {
-    mpz_sub_ui(p,p,1);
+    mpz_add_ui(p,p,1);
   }
   
   while ( !TestFermat(q) && !TestRabinMiller(q)) {
-    mpz_sub_ui(q,q,1);
+    mpz_add_ui(q,q,1);
   }
 
   mpz_mul (N, p, q);

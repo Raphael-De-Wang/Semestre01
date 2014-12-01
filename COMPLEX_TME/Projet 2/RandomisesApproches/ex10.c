@@ -58,7 +58,7 @@ int main( int argc, char *argv[]) {
       test_GenPKRSA();
       break;
     case '5':
-      
+      test_plus_grand_entier_GenPKRSA();
       break;
     default:
       break;
