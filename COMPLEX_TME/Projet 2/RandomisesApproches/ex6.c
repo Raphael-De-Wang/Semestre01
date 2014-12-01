@@ -112,10 +112,10 @@ int main( int argc, char *argv[]) {
       test_expo_mod();
       break;
     default:
+      puts("choix de Question: 1, 2, 3, else quit");
       break;
     }
-  } else {
-    puts("choix de Question: 1, 2, 3, else quit");
   }
+  
   return 0;
 }

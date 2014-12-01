@@ -6,22 +6,8 @@
 #include "randomises_et_approches.h"
 
 void test_first_test (void) {
-  mpz_t N;
-  char *str_N = (char *)malloc(INPUT_MAX_LENGTH);
-  
   puts("---- Q 7.1 first test ----");
-  puts("Grande Integer: ");
-  scanf("%s",str_N);
-  mpz_init_set_str(N, str_N, BASE);
-  
-  if ( first_test(N) == TRUE ) {
-    printf("Oui, c'est un primier !\n");
-  } else {
-    printf("Non, ce n'est pas un primier.\n");
-  }
-  
-  mpz_clear(N);
-  FREE(str_N);
+  test_callback(first_test, "nombre premier");
 }
 
 void test_premier_compteur (void) {
@@ -47,17 +33,8 @@ void test_premier_compteur (void) {
 
 
 void test_plus_grand_entier(void) {
-  int   sec       = 60;
-  char *borne_str = NULL;
-  mpz_t borne;
-  
-  puts("---- Q 7.3  plus grand entier qu'on peut tester ----");  
-  mpz_init_set_str(borne, "0", BASE);
-  plus_grand_entier_TestNaif(borne, sec);
-  printf("Le premier grand nombre que la fonction first_test ne peut pas tester en %d secondes:%s \n", sec, mpz_get_str(borne_str, BASE, borne));
-  
-  mpz_clear(borne);
-  FREE(borne_str);
+  puts("---- Q 7.3  plus grand entier qu'on peut tester ----");
+  test_plus_grand_entier_CallBack(plus_grand_entier_TestNaif);
 }
 
 int main( int argc, char *argv[]) {
@@ -75,11 +52,10 @@ int main( int argc, char *argv[]) {
       test_plus_grand_entier ();
       break;
     default:
+      puts("choix de Question: 1, 2, 3, else quit");
       break;
     }
-  } else {
-    puts("choix de Question: 1, 2, 3, else quit");
-  }
+  } 
   return 0;
 }
 

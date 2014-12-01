@@ -152,46 +152,29 @@ class Approche_Egalitariste_MinRegrets(Simple_Model):
     def definir_objectif(self):
         self.model.setObjective(gb.LinExpr(self.regrets), gb.GRB.MINIMIZE)
 
-class Approche_Egalitariste_Max_Flow:
+#### Bonus #####
+class OWA_MaxKAgents(Modelisation):
+    def __init__(self, k, model_name, solution_fixe):
+        self.k = k
+        self.solv = solution_fixe
+        Modelisation.__init__(self, model_name)
+        
+    def declarer_variables(self):
+        self.var_tb = [ self.model.addVar(vtype=gb.GRB.CONTINUOUS, name="y(%d)"%(i)) for i in range(self.k) ]
+        self.model.update()
 
-    def __init__(self, n, m, M, model_name):
-        self.n = n
-        self.m = m
-        self.M = M
-        self.model_name = model_name
-        self.solution = []
+    def definir_contraintes(self):
+        self.model.addConstr(gb.quicksum([ self.var_tb[i] for i in range(self.k) ]) >= self.k, "Contrainte-sigma-y")
+        for i,y in enumerate(self.var_tb):
+            self.model.addConstr( y <= 1, "Contrainte-sb-y%d"%(i))
+            self.model.addConstr( y >= 0, "Contrainte-ib-y%d"%(i))
+            
+    def definir_objectif(self):
+        self.model.setObjective(gb.quicksum([ self.var_tb[i] * self.solv[i] for i in range(self.k) ]), gb.GRB.MINIMIZE)
 
-    def max_flow_with_lambda(self, l):
-        satisfaction_tb = valeurs_table_aleatoire(n, m, M)
-        gr = digraph()
-        gr.add_nodes(["s", "p"])
-        for j in range(m):
-            gr.add_node("o%s" % j)
-            gr.add_edge(("o%s" % j, "p"), 1)
-        for i in range(n):
-            gr.add_node("a%s" % i)
-            gr.add_edge(("s", "a%s" % i), 1)
-            for j in range(m):
-                if satisfaction_tb[i][j] >= l:
-                    gr.add_edge(("a%s" % i, "o%s" % j), 1)
-        return maximum_flow(gr, "s", "p")
-
-    def resoudre(self):
-        _lambda = self.M
-        is_instance = False
-        while not is_instance:
-            _max_flow = self.max_flow_with_lambda(_lambda)
-            is_instance = True
-            for i in range(self.n):
-                if not _max_flow[1]["a%s" % i]:
-                    is_instance = False
-            _lambda -= 1
-        self.solution = [i for i in _max_flow[0] if _max_flow[0][i] and not "s" in i and not "p" in i], _lambda
-
-    def rapport(self):
-        for i in self.solution:
-            print "L'agent %d prend l'objet %d" % i
-
+    def solution(self):
+        return np.array([ self.var_tb[i].x for i in range(self.k)])
+        
 def ex3():
     N        = [10,50,100,500,1000]
     M        = [10,100,1000]
@@ -220,6 +203,18 @@ def ex11():
     fname    = "MOGPL_REPORT_Ex11.txt"
     general_test(N,M,num_iter,fname,Approche_Egalitariste_MinRegrets)
 
+def ex13():
+    k = 3
+    n = 10
+    m = 100
+    model_name = "MaxKAgents"
+    md = Simple_Model(n, n, m, "model-simple")
+    md.resoudre()
+    solv_fixe = np.sort(md.solution()[:,1])
+    md = OWA_MaxKAgents(k, model_name, solv_fixe)
+    md.resoudre()
+    print md.solution()
+    
 def general_test( N, M, num_iter, fname, Model):
     
     report = "Resultat: \n"
@@ -251,8 +246,5 @@ def general_test( N, M, num_iter, fname, Model):
     md.rapport(fname, report)
     
 if __name__ == '__main__':
-    ex3()
-    ex6()
-    ex8()
-    ex11()
+    ex13()
 
