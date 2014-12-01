@@ -36,7 +36,7 @@ void test_Gen_Carmichael(void) {
 }
 
 void test_lister_nombres_carmichael(void) {
-  int i, len = 0;
+  int i, len = 100;
   mpz_t borne;
   mpz_t** list = NULL;
   char *str = (char *)malloc(sizeof(char)*INPUT_MAX_LENGTH);
@@ -44,8 +44,6 @@ void test_lister_nombres_carmichael(void) {
   puts("---- Q 8.4 lister les nombres de Carmichael ----");  
   puts("Indiquer le borne : ");
   scanf("%s", str);
-  puts("Indiquer le longueur du list : ");
-  scanf("%d", &len);
   mpz_init_set_str(borne, str, BASE);
   list = lister_nombres_carmichael(borne, len);
   for ( i = 0; i < len ; i++ ) {
@@ -64,7 +62,7 @@ void test_plus_grand_entier_carmichael_trouve(void){
 
 int main( int argc, char *argv[]) {
   puts("==== Exercise 8 Nombre de Carmichael ====");
-
+  test_lister_nombres_carmichael();
   if ( argc > 1 ) {
     switch ( argv[1][0] ) {
     case '1':

@@ -67,15 +67,15 @@ void test_probs_erreur_CallBack(void(*CallBack)(mpf_t probs, const mpz_t borne))
   mpz_t borne;
   mpf_t probs;
   char *str = (char *)malloc(INPUT_MAX_LENGTH);
-  mp_exp_t expptr = 0;
+  //mp_exp_t expptr = 0;
     
   puts("Indiquer l'interval du Test : ");
   scanf("%s",str);
   mpf_init(probs);
   mpz_init_set_str(borne, str, BASE);
   CallBack(probs, borne);
-  mpf_get_str( str, &expptr, BASE, FLOAT_DIGITS, probs);
-  printf("Probabilite d'erreur de TestFermat est 0.%se%lu \n", str, (long)expptr);
+  //mpf_get_str( str, &expptr, BASE, FLOAT_DIGITS, probs);
+  gmp_printf("Probabilite d'erreur de TestFermat est %.*Ff \n", 6, probs);
 
   mpz_clear(borne);
   mpf_clear(probs);
@@ -89,7 +89,7 @@ void  test_plus_grand_entier_CallBack(void(*CallBack)(mpz_t, int)) {
   
   puts("Tester en secondes : ");
   scanf("%d", &sec);
-  mpz_init_set_str(borne, "0", BASE);
+  mpz_init_set_str(borne, "68000000000000000", BASE);
   CallBack(borne, sec);
   printf("Le premier grand nombre que la fonction ne peut pas tester en %d secondes:%s \n", sec, mpz_get_str(borne_str, BASE, borne));
   
@@ -114,31 +114,44 @@ void test_plus_grand_entier_trouve_CallBack(void(*CallBack)(mpz_t, int)) {
 
 void  probs_erreur(mpf_t probs, const mpz_t borne, int (*CallBack)(const mpz_t)) {
   mpz_t N;
-  mpf_t premier;
+  //mpf_t premier;
+  mpf_t borne_f;
   mpf_t echec;
+  char *str = NULL;
+
   
-  mpf_inits(premier,echec,NULL);
+  mpf_inits(borne_f,echec,NULL);
   mpz_init_set_str(N,"2",BASE);
   
   while ( mpz_cmp ( N, borne ) < 0 ) {
     if (CallBack(N)) {
-      mpf_add_ui(premier,premier,1);
-      if (Is_Carmichael(N)) {
+      //mpf_add_ui(premier,premier,1);
+      if (!first_test(N)) {
 	mpf_add_ui(echec,echec,1);	
       }
     }
     mpz_add_ui(N,N,1);
   }
-  mpf_div(probs, echec, premier);
+  str = mpz_get_str(str,BASE,borne);
+  mpf_init_set_str(borne_f, str, BASE);
+  mpf_div(probs, echec, borne_f);
   mpz_clear(N);
-  mpf_clears(premier,echec,NULL);
+  mpf_clears(borne_f,echec,NULL);
+  FREE(str);
 }
 
 void plus_grand_entier_sup_tlimit(mpz_t borne, int sec, int (*CallBack)(const mpz_t)) {
+  int t, max = 0;
   while( TRUE ) {
     int start = time(NULL);
     CallBack(borne);
-    if ( time(NULL) - start > sec ) {
+    t = time(NULL) - start;
+    if (t > max){
+      max = t;
+      printf("t: %d\t", max);
+      gmp_printf("borne: %Zd\n", borne);
+    }
+    if ( t > sec ) {
       break;
     }
     mpz_add_ui( borne, borne, 1);
@@ -232,6 +245,7 @@ int Is_Carmichael_Facteuriser(mpz_t div[], int len_div, const mpz_t N) {
   mpz_t k, r;
   
   mpz_inits(k,r,NULL);
+  gmp_printf("%Zu",N);
   mpz_sqrt(k, N);
   
   while ( mpz_cmp(div[i],k) <= 0 ) {
@@ -335,7 +349,7 @@ mpz_t** lister_nombres_carmichael(const mpz_t borne, int len) {
   mpz_t N;
   mpz_t **carmichaels = NULL;
 
-  mpz_init(N);
+  mpz_init_set_str(N,"2",BASE);
   carmichaels = (mpz_t **)malloc(sizeof(mpz_t*)*len);
   for ( i = 0; i < len; i++ ) {
     carmichaels[i] = NULL;
@@ -417,7 +431,7 @@ int TestRabinMiller(const mpz_t N) {
       break;
     }
   }
-  gmp_printf("a:%Zu\tr:%Zu\treste:%Zu\n", a, r, reste);
+  // gmp_printf("a:%Zu\tr:%Zu\treste:%Zu\n", a, r, reste);
   
   if ( s > 0 ) {
     mpz_fdiv_q_2exp (r, N_1, s);
