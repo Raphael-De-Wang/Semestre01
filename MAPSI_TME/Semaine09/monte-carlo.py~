@@ -1,0 +1,73 @@
+# -*- coding: utf-8 -*-
+
+import numpy as np
+import pickle as pkl
+import matplotlib.pyplot as pl
+
+def tirage (m,N=1) :
+    if N <= 1:
+        return np.random.uniform(-m,m,2)
+    else:
+        return np.random.uniform(-m,m,(N,2))
+
+def f(x,y,m):
+    if x**2 + y**2 <= m**2 :
+        return 1
+    return 0
+
+def PI(tirs):
+    return 4.0 * sum([ f(x,y,1) for [x,y] in tirs ]) / len(tirs)
+
+def monteCarlo (N) :
+    tirs = np.array(tirage (1,N))
+    return PI(tirs, N), tirs[:,0], tirs[:,1]
+
+def MCMC (m, burnin, mixin, N):
+    tirs = tirage (1,N)
+    mcmc_tirs = [ pos for i, pos in enumerate(tirs) if i > burnin and i%mixin == 0 ]
+    return PI(mcmc_tirs)
+
+def dessine():
+    pl.figure()
+    pl.plot([-1,-1,1,-1],[-1,1,1,-1],'-');
+    x = np.linspace(-1,1,100);
+    y = np.sqrt(1-x*x);
+    pl.plot(x,y,'b');
+    pl.plot(x,-y,'b');
+
+    pi, x, y = monteCarlo(int(1e4));
+
+    dist = x*x + y*y
+    pl.plot(x[dist<=1], y[dist<=1], "go")
+    pl.plot(x[dist>1], y[dist>1],   "ro")
+    pl.show()
+
+# Décodage par la méthode de Metropolis-Hastings
+(count, mu, A) = pkl.load(file("countWar.pkl", "rb"))
+secret  = (open("secret.txt","r").read())[0:-1]
+# secret2 = (open("secret2.txt","r").read())[0:-1]
+print count.keys()
+print np.shape(mu)
+print np.shape(A)
+#print secret
+
+def swapF(f):
+    hasard = [0,0]
+    while hasard[0] == hasard[1]:
+        hasard = np.floor(np.random.rand(2)*len(f))
+    keys = f.keys()
+    keys.sort()
+    k1 = keys[int(hasard[0])]
+    k2 = keys[int(hasard[1])]
+    f[k1],f[k2] = f[k2],f[k1]
+
+f = {'0':0,'1':1,'2':2,'3':3,'4':4,'5':5}
+swapF(f)
+print f
+
+def decrypt(m,f):
+    return [ f[c] for c in m ]
+
+def logLikelihood(m,mu,A,chars):
+    return 0
+    
