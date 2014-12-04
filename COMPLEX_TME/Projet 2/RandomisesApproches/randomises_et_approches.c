@@ -276,12 +276,14 @@ int Is_Carmichael_verification( mpz_t div[], const mpz_t N) {
       break;
     }
   }
+  
   mpz_clears(N_1,div_1,r,NULL);
   
   return flag;
 }
 
 int Is_Carmichael(const mpz_t N){
+  
   int flag    = TRUE;
   int i       = 0;
   int nom_fac = 3;
@@ -294,7 +296,7 @@ int Is_Carmichael(const mpz_t N){
 
   i = Is_Carmichael_Facteuriser(div, len_div, N);
   
-  if ( i >= nom_fac ) {
+  if ( i == nom_fac ) {
     flag = Is_Carmichael_verification(div, N);
   } else {
     flag = FALSE;

@@ -62,7 +62,7 @@ void test_plus_grand_entier_carmichael_trouve(void){
 
 int main( int argc, char *argv[]) {
   puts("==== Exercise 8 Nombre de Carmichael ====");
-  test_lister_nombres_carmichael();
+
   if ( argc > 1 ) {
     switch ( argv[1][0] ) {
     case '1':
