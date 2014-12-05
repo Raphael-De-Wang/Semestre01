@@ -26,7 +26,7 @@ void test_plus_grand_entier_TestFermat_trouve(void) {
 
 int main( int argc, char *argv[]) {
   puts("==== Exercise 9 Test de Fermat ====");
-  test_plus_grand_entier_TestFermat_trouve();
+  //test_plus_grand_entier_TestFermat_trouve();
   if ( argc > 1 ) {
     switch ( argv[1][0] ) {
     case '1':
