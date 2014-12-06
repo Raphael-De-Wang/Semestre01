@@ -83,14 +83,14 @@ def regression_logistique( X, Y, w, b, epsilon, N):
     return lv#, w, b
 
 epsilon = .00005
-nom_iter= 1
+nom_iter= 120
 vrais = regression_logistique( X, y, w, b, epsilon, nom_iter)
 
 def dessine_regression(vrais, nom_iter, epsilon):
     fig = plt.figure()
-    x = range(nom_iter)
+    x = range(nom_iter+1)
     y = vrais
-    plt.plot( x, y, label="$\sigma=%f"%epsilon)
+    plt.plot( x, y, label="$\epsilon=%f$"%epsilon)
     plt.xlabel("Nombre d'Iteration")
     plt.ylabel("Log Vraisemblance")
     plt.legend()
