@@ -44,47 +44,39 @@ logpT = logpobs(XT, theta) # application des modèles sur les données de test
 ypred  = logp.argmax(0)    # indice de la plus grande proba (colonne par colonne) = prédiction
 ypredT = logpT.argmax(0)
 
-# print "Taux bonne classification en apprentissage : ",np.where(ypred != Y, 0.,1.).mean()
-# print "Taux bonne classification en test : ",np.where(ypredT != YT, 0.,1.).mean()
+print "Taux bonne classification en apprentissage : ",np.where(ypred != Y, 0.,1.).mean()
+print "Taux bonne classification en test : ",np.where(ypredT != YT, 0.,1.).mean()
 
-(I,J) = np.shape(X)
-NOMBRE = 0
-y = np.where(Y==NOMBRE,1.,0.)
+def class_vecteur(Y,nombre):
+    return np.where(Y==nombre,1.,0.)
 
-def init_w0_b0():
+def init_w0_b0(J):
     return (np.random.rand(J)/10, np.random.rand())
 
-w,b = init_w0_b0()
-    
 def f(x, w, b) :
     return  1/(1+ np.exp(-x.dot(w) -b ))
 
 def log_vraisemblance( x, y, w, b):
     return (y * np.log(f(x,w,b)) + (1-y) * np.log(1-f(x,w,b))).sum()
 
-print log_vraisemblance( X, y, w, b)
-
 def derive_w(x, j, y, w, b) :
-    return ( x[:, j]* (y - f(x,w,b))).sum()
+    return (x[:, j]* (y - f(x,w,b))).sum()
 
-print derive_w(X, 1, y, w, b) 
-    
 def derive_b(x, y, w, b) :
     return (y - f(x,w,b)).sum()
 
-print derive_b(X[0], y, w, b)
+def regression_logistique( X, y, w, b, epsilon, N, lv=None ):
     
-def regression_logistique( X, Y, w, b, epsilon, N):
-    lv = [ log_vraisemblance( X, y, w, b) ]
+    if lv != None:
+        lv.append(log_vraisemblance ( X, y, w, b) )
+        
     for i in range(N):
-        w = [ w[j] + epsilon * derive_w(X, j, Y, w, b) for j in range(256) ]
+        w = [ w[j] + epsilon * derive_w(X, j, y, w, b) for j in range(256) ]
         b = b + epsilon * derive_b(X, y, w, b)
-        lv.append(log_vraisemblance( X, y, w, b))
-    return lv#, w, b
-
-epsilon = .00005
-nom_iter= 120
-vrais = regression_logistique( X, y, w, b, epsilon, nom_iter)
+        if lv != None:
+            lv.append(log_vraisemblance ( X, y, w, b) )
+        
+    return ( w, b )
 
 def dessine_regression(vrais, nom_iter, epsilon):
     fig = plt.figure()
@@ -94,7 +86,47 @@ def dessine_regression(vrais, nom_iter, epsilon):
     plt.xlabel("Nombre d'Iteration")
     plt.ylabel("Log Vraisemblance")
     plt.legend()
-    # plt.show()
     plt.savefig("regression(eps%f).png"%epsilon)
 
-dessine_regression(vrais, nom_iter, epsilon)
+def approche_discriminante(X,Y):
+    vrais   = []
+    NOMBRE  = 0
+    nom_iter= 3
+    epsilon = .00005
+    (I,J)   = np.shape(X)
+    w,b     = init_w0_b0(J)
+    y       = class_vecteur(Y,NOMBRE)
+    
+    regression_logistique( X, y, w, b, epsilon, nom_iter, vrais)
+    dessine_regression(vrais, nom_iter, epsilon)
+
+def apprendre_classifieurs( X, Y, nom_iter, epsilon):
+    (I,J)   = np.shape(X)
+    thetaRL = []
+    for NOMBRE in range(10):
+        # Pour transformer le vecteur Y afin de traiter la classe NOMBRE:
+        w,b     = init_w0_b0(J)
+        Yc      = class_vecteur(Y,NOMBRE)
+        thetaRL.append(regression_logistique( X, Yc, w, b, epsilon, nom_iter))
+
+    return thetaRL
+        
+# Paradigme un-contre-tous pour le passage au multi-classe
+def un_contre_tous(X,Y,XT,YT):
+    nom_iter= 3
+    epsilon = .00005
+    thetaRL = apprendre_classifieurs(X,Y,nom_iter,epsilon)
+    
+    # si vos paramètres w et b, correspondant à chaque classe, sont stockés sur les lignes de thetaRL... Alors:
+    # pRL  = np.array([[1./(1+np.exp(-x.dot(mod[0]) - mod[1])) for x in X] for mod in thetaRL ])
+    # pRLT = np.array([[1./(1+np.exp(-x.dot(mod[0]) - mod[1])) for x in XT] for mod in thetaRL ])
+    pRL  = np.array([[ f(x,mod(0),mod(1)) for x in X] for mod in thetaRL ])
+    pRLT = np.array([[ f(x,mod(0),mod(1)) for x in XT] for mod in thetaRL ])
+    
+    ypred  = pRL.argmax(0)
+    ypredT = pRLT.argmax(0)
+    
+    print "Taux bonne classification en apprentissage : ",np.where(ypred != Y, 0.,1.).mean()
+    print "Taux bonne classification en test : ",np.where(ypredT != YT, 0.,1.).mean()
+
+un_contre_tous(X,Y,XT,YT)
