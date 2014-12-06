@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import math
+import heapq
 import numpy as np
 import pickle as pkl
 import matplotlib.cm as cm
@@ -197,5 +198,41 @@ def modele_discriminant(X, Y, nombre):
 
 # modele_discriminant(X, Y, 2)
 
-# Optimisation du modèle discriminant
+#### Optimisation du modèle discriminant
+def regression_logistique_optimal( X, y, w, b, lv, epsilon, gd, iter_borne = 200):
+    # Mettre en place un critère d'arrêt basé sur l'évolution de la vraisemblance dans la procédure évolutive. L'idée est la même que dans les séances passée
+    i = 0
+    lv.append(log_vraisemblance ( X, y, w, b) )
+    while True:
+        w = [ w[j] + epsilon * derive_w(X, j, y, w, b) for j in range(256) ]
+        b = b + epsilon * derive_b(X, y, w, b)
+        lv.append(log_vraisemblance ( X, y, w, b) )
+        i += 1
+        if ( lv[i] - lv[i-1] < gd ) or ( i > iter_borne ) :
+            break
+
+    return ( w, b )
+
+def modele_discriminant_optimisation(X,Y,lv,nombre):
+    gd      = 0.01
+    epsilon = .00005
+    (I,J)   = np.shape(X)
+    w,b     = init_w0_b0(J)
+    Yc      = class_vecteur(Y,nombre)
+    return regression_logistique_optimal( X, Yc, w, b, lv, epsilon, gd)
+
+# Mettre en place une stratégie de rejet des échantillons ambigus: étudier l'amélioration des résultats en fonction du nombre d'échantillon rejetés. Etudier en particulier les cas suivants:
+def rejet_echantillons_ambigus(X,Y,models,seuil,CALLBACK):
+    return X[CALLBACK(X, models, seuil)], Y[CALLBACK(X, models, seuil)]
+
+def passe_borne(X, models, seuil):
+    return [ max([ f( X[i], mdl[0], mdl[1] ) for mdl in models ]) > seuil for i in range(len(X)) ]
+
+def ambigus_proche(X, models, seuil):
+    p = []
+    for i in range(len(X)):
+        vrais = heapq.nlargest(1, [ f( X[i], mdl[0], mdl[1] ) for mdl in models ] )
+        p.append(vrais[0] - vrais[1] < seuil)
+    return p
+
 
