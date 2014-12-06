@@ -120,8 +120,8 @@ def un_contre_tous(X,Y,XT,YT):
     # si vos paramètres w et b, correspondant à chaque classe, sont stockés sur les lignes de thetaRL... Alors:
     # pRL  = np.array([[1./(1+np.exp(-x.dot(mod[0]) - mod[1])) for x in X] for mod in thetaRL ])
     # pRLT = np.array([[1./(1+np.exp(-x.dot(mod[0]) - mod[1])) for x in XT] for mod in thetaRL ])
-    pRL  = np.array([[ f(x,mod(0),mod(1)) for x in X] for mod in thetaRL ])
-    pRLT = np.array([[ f(x,mod(0),mod(1)) for x in XT] for mod in thetaRL ])
+    pRL  = np.array([[ f(x,mod[0],mod[1]) for x in X ] for mod in thetaRL ])
+    pRLT = np.array([[ f(x,mod[0],mod[1]) for x in XT] for mod in thetaRL ])
     
     ypred  = pRL.argmax(0)
     ypredT = pRLT.argmax(0)
