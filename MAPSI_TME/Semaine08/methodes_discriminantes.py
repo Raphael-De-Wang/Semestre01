@@ -3,6 +3,7 @@
 import math
 import numpy as np
 import pickle as pkl
+import matplotlib.pyplot as plt
 
 # fonction de suppression des 0 (certaines variances sont nulles car les pixels valent tous la même chose)
 def woZeros(x): 
@@ -51,35 +52,46 @@ NOMBRE = 0
 y = np.where(Y==NOMBRE,1.,0.)
 
 def init_w0_b0():
-    return (np.random.rand(256), np.random.rand())
+    return (np.random.rand(J)/10, np.random.rand())
 
 w,b = init_w0_b0()
     
 def f(x, w, b) :
-    return 1/(1+ np.exp(-x.dot(w) -b ))
+    return  1/(1+ np.exp(-x.dot(w) -b ))
 
-print f(x, 0, 0)
-    
 def log_vraisemblance( x, y, w, b):
-    lv = y * np.log(f(x,w,b)) + (1-y) * np.log(1-f(x,w,b))
-    return np.minimum(lv[ lv != np.NINF ],1-1e-8)
+    return (y * np.log(f(x,w,b)) + (1-y) * np.log(1-f(x,w,b))).sum()
 
-# print log_vraisemblance( X, y, w, b)
+print log_vraisemblance( X, y, w, b)
 
 def derive_w(x, j, y, w, b) :
     return ( x[:, j]* (y - f(x,w,b))).sum()
+
+print derive_w(X, 1, y, w, b) 
     
 def derive_b(x, y, w, b) :
     return (y - f(x,w,b)).sum()
 
+print derive_b(X[0], y, w, b)
+    
 def regression_logistique( X, Y, w, b, epsilon, N):
     lv = [ log_vraisemblance( X, y, w, b) ]
     for i in range(N):
         w = [ w[j] + epsilon * derive_w(X, j, Y, w, b) for j in range(256) ]
         b = b + epsilon * derive_b(X, y, w, b)
         lv.append(log_vraisemblance( X, y, w, b))
-    return lv#x, w, b
+    return lv#, w, b
     
-# print regression_logistique( X, y, w, b, .001, 3)
+print regression_logistique( X, y, w, b, .00005, 120)
+
+def dessine_regression(vrais, nom_iter, epsilon):
+    fig = plt.figure()
+    x = range(nom_iter)
+    y = vrais
+    plt.plot( x, y, label="$\sigma=%f"%epsilon)
+    plt.xlabel("Nombre d'Iteration")
+    plt.ylabel("Log Vraisemblance")
+    plt.legend()
+    plt.show()
 
 
