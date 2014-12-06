@@ -1,0 +1,69 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# ---- Exercise 1 Methode de resoluton numerique dans les systemes dynamiques -----
+def f(x):
+    return 0.1 * x * ( 30 - x )
+
+def f2(variable):
+    [ x, y ] = variable
+    return np.array([0.25*x - 0.01*x*y, 0.01*x*y - y])
+
+def init_x(val_init_x, n):
+    if type(val_init_x) == type([]):
+        x = np.zeros([n,len(val_init_x)])
+    else:
+        x = np.zeros([n,])
+    return x
+    
+def euler(func, val_init_x, tf = 100, n = 500):
+    h = tf/float(n)
+    x = init_x(val_init_x, n)
+    x[0] = val_init_x
+    for i in range(n-1):
+        x[i+1] = x[i] + h * func(x[i])
+    return x
+
+def RK2(func, val_init_x, tf = 100, n = 500):
+    h = tf/float(n)
+    x = init_x(val_init_x, n)
+    x[0] = val_init_x
+    for i in range(n-1):
+        x[i+1] = x[i] + (h/2) * func(x[i]) + (h/2) * func(x[i]+h*func(x[i]))
+    return x
+
+def desine_Q3():
+    fig = plt.figure()
+    plt.plot(euler(f, 5, tf=10), label='x(0)=5  euler')
+    plt.plot(euler(f,50, tf=10), label='x(0)=50 euler')
+    plt.xlabel('Time')
+    plt.ylabel('Population Number')
+    plt.legend()
+    plt.show()
+    
+def dessine_Q5():
+    fig = plt.figure()
+    plt.plot(RK2(f, 5, tf=10), label='x(0)=5  RK2')
+    plt.xlabel('Time')
+    plt.ylabel('Population Number')
+    plt.legend()
+    plt.show()
+    
+def calcul_erreur_Q6(func, val_init_x, tf = 100, n = 500):
+    return ((sum(euler(func, val_init_x, tf, n)) - sum(RK2(func, val_init_x, tf, n)))**2)/n
+    
+def dessine_Q8():
+    fig = plt.figure()
+    points = RK2(f2,[80,30])
+    plt.plot(points[:,0], points[:,1], label='systeme 1, x0=80, y0=30 RK2')
+    points = euler(f2,[80,30])
+    plt.plot(points[:,0], points[:,1], label='systeme 2, x0=80, y0=30 euler')
+    plt.xlabel('Time')
+    plt.ylabel('Population Number')
+    plt.legend()
+    plt.show()
+
+dessine_Q3()
+dessine_Q5()
+print "le moyenne du carre de l'erreur: ", calcul_erreur_Q6(f,5)
+dessine_Q8()

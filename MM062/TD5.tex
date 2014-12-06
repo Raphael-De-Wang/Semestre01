@@ -1,0 +1,158 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+\usepackage{graphicx} 
+\usepackage{titlesec}
+
+%opening
+\title{Résolution numérique en Python}
+\author{WANG Jinxin 3404759}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\indent
+1) Méthode de résolution numérique dans les systèmes dynamiques\\
+\indent
+2) Équation de diffusion\\
+\end{abstract}
+
+\newpage
+\section{Méthode de résolution numérique dans les systèmes dynamiques}
+
+\subsection{ Compléter (3) afin que le code implémente la méthode d'Euler }
+\begin{lstlisting}[language=Python]
+    for i in range(n-1):
+	x[i+1] = x[i] + h * func(x[i]) # (3)
+\end{lstlisting} 
+
+\subsection {En compléter (1) et (2), résoudre numériquement l'équation de croissance logistique}
+\begin{lstlisting}[language=Python]
+
+    def f(x):
+	return 0.1 * x * ( 30 - x ) # (1)
+
+    def init_x(val_init_x, n):
+	if type(val_init_x) == type([]):
+	    x = np.zeros([n,len(val_init_x)])
+	else:
+	    x = np.zeros([n,])
+	return x
+    
+    def euler(func, val_init_x, tf = 100, n = 500):
+	h = tf/float(n)
+	x = init_x(val_init_x, n)
+	x[0] = val_init_x # (2)
+	for i in range(n-1):
+	    x[i+1] = x[i] + h * func(x[i])
+	return x
+	
+    euler(f, 5, tf=10)
+    euler(f,50, tf=10)   
+
+\end{lstlisting} 
+\subsection{ DM Tracer sur un meme graphe l'équation de la popluation poiur x0=5 et x0=50 }
+\begin{center}
+\includegraphics[height=2.5in]{TD2-Q3.png}
+\end{center}
+
+\subsection { Runge-Kutta }
+\begin{lstlisting}[language=Python]
+
+    def RK2(func, val_init_x, tf = 100, n = 500):
+	h = tf/float(n)
+	x = init_x(val_init_x, n)
+	x[0] = val_init_x
+	for i in range(n-1):
+	    x[i+1] = x[i] + (h/2) * func(x[i]) 
+		      + (h/2) * func(x[i]+h*func(x[i]))
+	return x
+
+    RK2(f, 5, tf=10)
+
+\end{lstlisting} 
+
+\begin{center}
+\includegraphics[height=2.5in]{TD2-Q5.png}
+\end{center}
+
+\subsection { Un programme qui évqlue le moyenne du carré de l'erreur }
+\begin{lstlisting}[language=Python]
+
+    def calcul_erreur_Q6(func, val_init_x, tf = 100, n = 500):
+	return ((sum(euler(func, val_init_x, tf, n)) 
+		  - sum(RK2(func, val_init_x, tf, n)))**2)/n
+
+\end{lstlisting}
+
+\subsection { En utilisant la méthode d'Euler, modifier le code pour résoudre le système}
+\begin{lstlisting}[language=Python]
+
+    def f2(variable):
+	[ x, y ] = variable
+	return np.array([0.25*x - 0.01*x*y, 0.01*x*y - y])
+
+    def init_x(val_init_x, n):
+	if type(val_init_x) == type([]):
+	    x = np.zeros([n,len(val_init_x)])
+	else:
+	    x = np.zeros([n,])
+	return x    
+	
+    euler(f2,[80,30])
+
+\end{lstlisting}
+
+\subsection { Tracer le portrait de phase pour x(0) = 80 et y(0) = 30 }
+
+\begin{center}
+\includegraphics[height=2.7in]{TD2-Q8.png}
+\end{center}
+
+\begin{lstlisting}[language=Python]
+    points = RK2(f2,[80,30])
+    plt.plot(points[:,0], points[:,1], label='systeme 1, x0=80, y0=30 RK2')
+    points = euler(f2,[80,30])
+    plt.plot(points[:,0], points[:,1], label='systeme 2, x0=80, y0=30 euler')
+\end{lstlisting}
+
+\subsection { La solution obtenue correspond-t-elle au résultat attendu }
+    Le figure obtenu correspond au résultat attendu. En temps passe, la popluation circule et approximate. Ils sont en fin stables. 
+
+\section{Équation de diffusion}
+\subsection { simuler l'évolution de la diffusion }
+\begin{lstlisting}[language=Python]
+# ---- Exercise 2 Equation de diffusion ----
+import numpy as np
+import matplotlib.pyplot as plt
+
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+
+tf = 100; nt=100; nx=100; a=1e-3; x=10
+dt = tf/float(nt)
+dx = x/float(nx) 
+x0 = nx/2
+
+U  = np.zeros([nt,nx])
+U[0, x0] = 1
+
+for k in range(0, nt-1):
+    for i in range(1,nx-1):
+        U[k+1,i]= U[k,i]+a*U[k,i+1]-2*U[k,i]+U[k,i-1] # (4)
+
+fig = plt.figure()
+ax  = fig.gca(projection ='3d')
+X   = np.arange(0, x, dx); T = np.arange(0,tf,dt)
+X, T= np.meshgrid(X,T)
+surf= ax.plot_surface(X, T, U, rstride=1, cstride=1, cmap=cm.coolwarm, linewidth = 0, antialiased =False)
+fig.colorbar(surf)
+plt.show()
+\end{lstlisting}
+
+\subsection{La condition de bord dans le programme précedent correspond à 1}
+
+\end{document}
