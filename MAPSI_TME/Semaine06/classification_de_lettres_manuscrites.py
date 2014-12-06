@@ -118,9 +118,9 @@ def main():
     X = np.array(data.get('letters')) # récupération des données sur les lettres
     Y = np.array(data.get('labels')) # récupération des étiquettes associées
     d = 20
-    lettre = 4
-    groups =  groupByLabel( Y )
-    (pi, A) =  learnMarkovModel ( np.array([ discretisation( X[pos], d ) for pos in groups[0] ]), d )
+    lettre  = 4
+    groups  = groupByLabel( Y )
+    (pi, A) = learnMarkovModel ( np.array([ discretisation( X[pos], d ) for pos in groups[0] ]), d )
     modeles = stocker_les_modeles (d, X, Y)
 
     # ---- Test: affectation dans les classes sur critère MV ----
