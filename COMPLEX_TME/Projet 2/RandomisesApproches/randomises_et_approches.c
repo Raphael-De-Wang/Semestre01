@@ -75,7 +75,7 @@ void test_probs_erreur_CallBack(void(*CallBack)(mpf_t probs, const mpz_t borne))
   mpz_init_set_str(borne, str, BASE);
   CallBack(probs, borne);
   //mpf_get_str( str, &expptr, BASE, FLOAT_DIGITS, probs);
-  gmp_printf("Probabilite d'erreur de TestFermat est %.*Ff \n", 6, probs);
+  gmp_printf("Probabilite d'erreur est %.*Ff \n", 6, probs);
 
   mpz_clear(borne);
   mpf_clear(probs);
@@ -118,7 +118,7 @@ void  probs_erreur(mpf_t probs, const mpz_t borne, int (*CallBack)(const mpz_t))
   char *str = NULL;
   
   mpf_inits(borne_f,echec,NULL);
-  mpz_init_set_str(N,"2",BASE);
+  mpz_init_set_str(N,"7",BASE);
   
   while ( mpz_cmp ( N, borne ) < 0 ) {
     if (CallBack(N)) {
@@ -166,12 +166,14 @@ void random_nombre_b(mpz_t rand, mp_bitcnt_t n) {
   gmp_randstate_t state;
   gmp_randinit_default (state);
   mpz_urandomb (rand, state, n);
+  gmp_randclear(state);
 }
 
 void random_nombre_m(mpz_t rand, const mpz_t borne) {
   gmp_randstate_t state;
   gmp_randinit_default (state);
   mpz_urandomm (rand, state, borne);
+  gmp_randclear(state);
 }
 
 void random_nombre_premier (mpz_t rand, const mpz_t borne) {
@@ -238,24 +240,26 @@ void  plus_grand_entier_TestNaif(mpz_t borne, int sec){
 int Is_Carmichael_Facteuriser(mpz_t div[], int len_div, const mpz_t N) {
   /** facteuriser **/
   int i = 0;
-  mpz_t k, r;
+  mpz_t k, r, N_;
   
-  mpz_inits(k,r,NULL);
+  mpz_inits(k,r, N_,NULL);
   mpz_sqrt(k, N);
+  mpz_set(N_, N);
   
   while ( mpz_cmp(div[i],k) <= 0 ) {
-    mpz_mod (r, N, div[i]);
+    mpz_mod (r, N_, div[i]);
     if (mpz_cmp_ui(r, 0) == 0 ) {
-      mpz_set(div[i+1], div[i]);
+      mpz_cdiv_q(N_,N_,div[i]);
       i++;
+    } else {
+      mpz_nextprime (div[i], div[i]);
     }
     
     if ( i > 3 ) break;
     
-    mpz_nextprime (div[i], div[i]);
   }
 
-  mpz_clears(k,r,NULL);
+  mpz_clears(k,r,N_,NULL);
   
   return i;
 }
@@ -267,14 +271,18 @@ int Is_Carmichael_verification( mpz_t div[], const mpz_t N) {
 
   mpz_inits(r, N_1, div_1, NULL);
   mpz_sub_ui (N_1, N, 1);
-  
-  for (i = 0; i < 3; i++) {
-    mpz_sub_ui (div_1, div[i], 1);
-    mpz_mod (r, N_1, div_1);
-    if (mpz_cmp_ui(r, 0) != 0 ) {
-      flag = FALSE;
-      break;
+
+  if ( (mpz_cmp(div[0],div[1])) && (mpz_cmp(div[0],div[2])) && (mpz_cmp(div[2],div[1])) ){
+    for (i = 0; i < 3; i++) {
+      mpz_sub_ui (div_1, div[i], 1);
+      mpz_mod (r, N_1, div_1);
+      if (mpz_cmp_ui(r, 0) != 0 ) {
+	flag = FALSE;
+	break;
+      }
     }
+  }else{
+    flag = FALSE;
   }
   
   mpz_clears(N_1,div_1,r,NULL);
@@ -415,7 +423,7 @@ int TestRabinMiller(const mpz_t N) {
   int flag = TRUE;
   mp_bitcnt_t i, s = 0;
   mpz_t N_1, reste, a, r;
-  
+  //gmp_printf ("N: %Zd\n", N);
   mpz_inits( N_1, reste, a, r, NULL);
   mpz_sub_ui(N_1, N, 1);
   
@@ -463,7 +471,9 @@ int TestRabinMiller(const mpz_t N) {
 }
 
 void  TestRobinMiller_probs_erreur(mpf_t probs, const mpz_t borne) {
-  probs_erreur( probs, borne, TestRabinMiller);
+  int (*CallBack)(const mpz_t);
+  CallBack = &TestRabinMiller;
+  probs_erreur( probs, borne, CallBack);
 }
 
 void plus_grand_entier_TestRabinMiller(mpz_t borne, int sec) {
