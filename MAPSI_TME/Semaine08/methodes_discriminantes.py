@@ -81,8 +81,10 @@ def regression_logistique( X, Y, w, b, epsilon, N):
         b = b + epsilon * derive_b(X, y, w, b)
         lv.append(log_vraisemblance( X, y, w, b))
     return lv#, w, b
-    
-print regression_logistique( X, y, w, b, .00005, 120)
+
+epsilon = .00005
+nom_iter= 1
+vrais = regression_logistique( X, y, w, b, epsilon, nom_iter)
 
 def dessine_regression(vrais, nom_iter, epsilon):
     fig = plt.figure()
@@ -92,6 +94,7 @@ def dessine_regression(vrais, nom_iter, epsilon):
     plt.xlabel("Nombre d'Iteration")
     plt.ylabel("Log Vraisemblance")
     plt.legend()
-    plt.show()
+    # plt.show()
+    plt.savefig("regression(eps%f).png"%epsilon)
 
-
+dessine_regression(vrais, nom_iter, epsilon)
