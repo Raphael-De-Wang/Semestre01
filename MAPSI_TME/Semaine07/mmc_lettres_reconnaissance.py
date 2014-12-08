@@ -216,7 +216,7 @@ def generateHMM(Pic, Ac, Bc, longeur):
     x = [ random_prendre( Bc[s[0]]) ]
     for i in xrange(longeur - 1):
         s.append(random_prendre(Ac[s[i]]))
-        x.append(random_prendre(Bc[s[i]]))
+        x.append(random_prendre(Bc[s[i+1]]))
 
     return s,x
 
