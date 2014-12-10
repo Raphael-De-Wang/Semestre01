@@ -1,0 +1,22 @@
+premiere lecture:
+1 vocabulaire difficile et definitions vagues
+  - Mass spectrometry ( wiki, youtube ) -> Séquençage par spectrométrie de masse -> Séquençage des protéines
+
+
+Structure: 
+1. but : 
+       title key words - "next-generation", "integrative" et "dynamics" 
+       Abstract -  Next-generation sequencing allows the analysis of genomes, including those representing disease states. (advantage, peculiarity)
+2. points principles
+3. logiques 
+
+Resume:
+plan de l'acticle
+
+
+Analyse et augmentation, conclusion
+
+
+Reference:
+
+
