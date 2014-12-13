@@ -31,7 +31,7 @@ def initGD(X,N):
     return np.array([ seq_Xd(x,N) for x in X ])
 
 # Apprentissage
-def learnHMM(allx, allq, N, K, initTo0=False):
+def learnHMM(allx, allq, N, K, initTo0=True):
     
     if np.shape(allx) <> np.shape(allq):
         raise Exception("Invalid Data")
@@ -138,6 +138,7 @@ def baum_welch_simplifie( lv_lst, X, Y, N = 5, K = 10):
         for lettre in alphabet:
             # 1. Apprentissage des modèles
             ( Pi, A, B ) = learnHMM( Xd[Y==lettre], q[Y==lettre], N, K)
+            # print "nom_iter: %d"%nom_iter, B
             alpha.append((Pi,A,B))
             # 2. Estimation des états cachés par Viterbi
             for [i] in np.argwhere(Y==lettre):
@@ -158,6 +159,7 @@ def tracer_evolution_vraisemblance(lv_list):
     plt.ylabel("Log Vraisemblance")
     plt.savefig("vraisemblance_regression.png")
     
+
 '''
 lv_lst = []
 baum_welch_simplifie( lv_lst, X, Y,)
@@ -216,7 +218,7 @@ def generateHMM(Pic, Ac, Bc, longeur):
     x = [ random_prendre( Bc[s[0]]) ]
     for i in xrange(longeur - 1):
         s.append(random_prendre(Ac[s[i]]))
-        x.append(random_prendre(Bc[s[i]]))
+        x.append(random_prendre(Bc[s[i+1]]))
 
     return s,x
 
@@ -259,4 +261,4 @@ def test( X, Y, models, N = 5, K = 10):
 lv_lst = []
 models = baum_welch_simplifie( lv_lst, X, Y,)
 # evaluation_qualitative( X, Y, groupByLabel(Y), models)
-test(X, Y, models)
+# test(X, Y, models)
