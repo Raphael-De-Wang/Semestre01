@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import copy
 import numpy as np
 import pickle as pkl
 import matplotlib.pyplot as plt
@@ -53,23 +54,23 @@ def stocker_les_modeles (d, X, Y) :
     return models
 
 def probaSeq( seq, Pi, A) :
-    probs = Pi[seq[0]]
+    probs = np.log(Pi[seq[0]])
     for j in range( len(seq) - 1 ) :
         begin = seq[j]
         to    = seq[j+1]
-        probs *= A[begin, to]
-    return np.log(probs)
+        probs+= np.log(A[begin, to])
+    return probs
 
 def probaSeqModele( seq, modeles ) :
     return np.array([ probaSeq(seq, pg[0], pg[1]) for pg in modeles ])
     
-def evaluation_des_performances( Xd, Y, models ):
+def evaluation_des_performances( Xd, Y, models, d ):
     proba = np.array([ [ probaSeq( Xd[i], models[cl][0], models[cl][1]) for i in range( len(Xd) ) ] for cl in range( len( np.unique(Y) ) ) ])
     Ynum = np.zeros(Y.shape)
     for num,char in enumerate(np.unique(Y)):
         Ynum[Y==char] = num
     pred = proba.argmax(0) # max colonne par colonne
-    print 'Evaluation Des Performances Résultat: ', np.where(pred != Ynum, 0.,1.).mean()
+    print 'Evaluation Des Performances Résultat [%d]: '%d, np.where(pred != Ynum, 0.,1.).mean()
 
 # separation app/test, pc=ratio de points en apprentissage
 def separeTrainTest(y, pc):
@@ -96,8 +97,8 @@ def evaluation_qualitative( X, Y, group, models):
     plt.ylabel(u'Prédiction')
     plt.savefig("mat_conf_lettres.png")
 
-def tirer_un_nombre ():
-    return np.random.rand(1)[0]
+def random_nombre ():
+    return np.random.rand()
     
 def tirage_selon_loi_sc( SC, rand_num ):
     for i, p in enumerate(SC) :
@@ -107,61 +108,51 @@ def tirage_selon_loi_sc( SC, rand_num ):
 def generate( Pi, A, n ):
     pi = Pi.cumsum()
     a  = np.array([ i.cumsum() for i in A ])
-    newa = [ tirage_selon_loi_sc( pi, tirer_un_nombre() ) ]
+    newa = [ tirage_selon_loi_sc( pi, random_nombre() ) ]
     for i in range( n - 1 ):
-        newa += [ tirage_selon_loi_sc( a[newa[i-1]], tirer_un_nombre() ) ]
+        newa += [ tirage_selon_loi_sc( a[newa[i-1]], random_nombre() ) ]
     return np.array(newa)
+
+def iSet_to_Y(itrain,itest,X,Y):
+    Xtrain = []
+    Ytrain = []
+    Xtest  = []
+    Ytest  = []
+
+    for i in np.concatenate(itest): 
+        Xtest.append(X[i])
+        Ytest.append(Y[i])
+                
+    for i in np.concatenate(itrain):
+        Xtrain.append(X[i])
+        Ytrain.append(Y[i])
+
+    return np.array(Xtrain),np.array(Ytrain),np.array(Xtest),np.array(Ytest)
             
 def main():
     # ---- Classification de lettres manuscrites ----
     data = pkl.load(file("TME6_lettres.pkl","rb"))
     X = np.array(data.get('letters')) # récupération des données sur les lettres
     Y = np.array(data.get('labels')) # récupération des étiquettes associées
-    d = 20
-    lettre = 4
-    groups =  groupByLabel( Y )
-    (pi, A) =  learnMarkovModel ( np.array([ discretisation( X[pos], d ) for pos in groups[0] ]), d )
-    modeles = stocker_les_modeles (d, X, Y)
 
-    # ---- Test: affectation dans les classes sur critère MV ----
-    # probs = probaSequence( discretisation( X[0], d ), modeles[0][0], modeles[0][1] )
-    # print probaSeqModele( discretisation( X[0], d ), modeles )
-    # evaluation_des_performances( discretisation( X, d ), Y, modeles )
-    '''
     itrain,itest = separeTrainTest(Y,0.8)
-    Y_indice = np.unique(Y)
-    
-    ia_x = []
-    ia_y = []
-    for i, cls in enumerate( itrain ) :
-        ia_x += cls.tolist()
-        ia_y += [ Y_indice[i] for j in range( len(cls) ) ]
-
-    ia_x = np.array(ia_x)
-    ia_y = np.array(ia_y)
-        
-    it_x = []
-    it_y = []
-    for i, cls in enumerate( itest ):
-        it_x += cls.tolist()
-        it_y += [ Y_indice[i] for j in range( len(cls) ) ]
-
-    it_x = np.array(it_x)
-    it_y = np.array(it_y)
-        
-    modeles = stocker_les_modeles ( d, X[ia_x], ia_y )
+    Xtrain,Ytrain,Xtest,Ytest = iSet_to_Y(itrain,itest,X,Y)
 
     # ---- Biais d'évaluation, notion de sur-apprentissage ----
-    evaluation_des_performances( discretisation( X[it_x], d ), it_y, modeles )
+    for d in xrange(3,30):
+        # modeles = stocker_les_modeles ( d, Xtrain, Ytrain )
+        modeles = stocker_les_modeles ( d, X, Y )
+        evaluation_des_performances( discretisation( Xtest, d ), Ytest, modeles, d )
 
     # ---- Evaluation qualitative ----
-    evaluation_qualitative( discretisation( X, d ), it_y, itest, modeles)
+    #evaluation_qualitative( discretisation( X, d ), it_y, itest, modeles)
     '''
     # ---- Modèle génératif ----
     newa = generate(modeles[lettre][0],modeles[lettre][1], 25) # generation d'une séquence d'états
     intervalle = 360./d # pour passer des états => valeur d'angles
     newa_continu = np.array([i*intervalle for i in newa]) # conv int => double
     tracerLettre(newa_continu)
-
+    '''
+    
 if __name__ == "__main__":
     main()

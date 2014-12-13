@@ -66,7 +66,8 @@ class Simple_Model(Modelisation):
     def __init__(self, n, m, M, model_name):
         self.agent_num = n
         self.objet_num = m
-        self.satisfaction_tb = self.valeurs_table_aleatoire(n, m, M)
+        # self.satisfaction_tb = self.valeurs_table_aleatoire(n, m, M)
+        self.satisfaction_tb = np.array([[3,6,17,6,12],[6,2,12,13,5],[10,10,4,7,13],[14,17,10,6,19],[11,12,9,10,6]])
         Modelisation.__init__(self, model_name)
 
     def declarer_variables(self):
@@ -176,16 +177,16 @@ class OWA_MaxKAgents(Modelisation):
         return np.array([ self.var_tb[i].x for i in range(self.k)])
         
 def ex3():
-    N        = [10,50,100,500,1000]
-    M        = [10,100,1000]
-    num_iter = 10
+    N        = [5]
+    M        = [20]
+    num_iter = 1
     fname    = "MOGPL_REPORT_Ex03.txt"
     general_test(N,M,num_iter,fname,Simple_Model)
 
 def ex6():
-    N        = [10,50,100]
-    M        = [100]
-    num_iter = 10
+    N        = [5]# [10,50,100]
+    M        = [20]# [100]
+    num_iter = 1
     fname    = "MOGPL_REPORT_Ex06.txt"
     general_test(N,M,num_iter,fname,Approche_Egalitariste_MaxMin)
 
@@ -247,4 +248,4 @@ def general_test( N, M, num_iter, fname, Model):
     
 if __name__ == '__main__':
     ex13()
-
+    ex6()
