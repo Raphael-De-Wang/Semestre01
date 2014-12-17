@@ -59,3 +59,104 @@ http://people.cst.cmich.edu/baile1re/bio101fall/enzphoto/enzphoto/photosy/photno
 
 Techniques de biologie moléculaire:
 http://fr.wikipedia.org/wiki/Techniques_de_biologie_moléculaire
+
+
+==========================================================================================
+
+Spectrométrie de masse : http://fr.wikipedia.org/wiki/Spectrom%C3%A9trie_de_masse
+
+Tandem mass spectrometry : http://en.wikipedia.org/wiki/Tandem_mass_spectrometry
+       Selected reaction monitoring : http://en.wikipedia.org/wiki/Selected_reaction_monitoring
+       
+Chromatographie en phase liquide-spectrométrie de masse : http://fr.wikipedia.org/wiki/Chromatographie_en_phase_liquide-spectrom%C3%A9trie_de_masse
+
+Modification post-traductionnelle: http://fr.wikipedia.org/wiki/Modification_post-traductionnelle
+
+High-performance liquid chromatography(HPLC): http://en.wikipedia.org/wiki/High-performance_liquid_chromatography#Normal_phase_chromatography
+	Hydrophilic interaction liquid chromatography (HILIC) : http://en.wikipedia.org/wiki/Hydrophilic_interaction_chromatography
+	Ion chromatography : http://en.wikipedia.org/wiki/Ion_chromatography
+	Reversed-phase chromatography: http://en.wikipedia.org/wiki/Reversed-phase_chromatography
+	Reversed phase HPLC (RP-HPLC): http://en.wikipedia.org/wiki/High-performance_liquid_chromatography#Reversed-phase_chromatography_.28RPC.29
+	
+Affinity chromatography: http://en.wikipedia.org/wiki/Affinity_chromatography
+	Immobilized metal ion affinity chromatography : http://en.wikipedia.org/wiki/Affinity_chromatography#Immobilized_metal_ion_affinity_chromatography
+
+Proteogenomics: http://en.wikipedia.org/wiki/Proteogenomics
+
+Embryonic stem cell: http://en.wikipedia.org/wiki/Embryonic_stem_cell
+
+Induced pluripotent stem cell: http://en.wikipedia.org/wiki/Induced_pluripotent_stem_cell
+
+Quantitative proteomics: http://en.wikipedia.org/wiki/Quantitative_proteomics
+
+Fragmentation: http://en.wikipedia.org/wiki/Fragmentation_(chemistry)
+	Electron-transfer dissociation(ETD) : http://en.wikipedia.org/wiki/Electron-transfer_dissociation
+
+Phosphoproteomics : http://en.wikipedia.org/wiki/Phosphoproteomics
+
+Isotopic labeling : http://en.wikipedia.org/wiki/Isotopic_labeling
+
+Filter Aided Sample Preparation (FASP) : http://www.vivaproducts.com/downloads/vivaspin-app-notes-10.pdf
+
+Ubiquitylation : http://laboangers.ca/ubiquitylation.html
+Ubiquitin : http://en.wikipedia.org/wiki/Ubiquitin
+
+Small Ubiquitin-like Modifier (or SUMO) proteins : http://en.wikipedia.org/wiki/SUMO_protein
+Sumoylation : http://fr.wikipedia.org/wiki/Sumoylation
+
+Protein tag : http://en.wikipedia.org/wiki/Protein_tag
+
+Immunoprécipitation : http://fr.wikipedia.org/wiki/Immunopr%C3%A9cipitation
+
+Glycosylation : http://en.wikipedia.org/wiki/Glycosylation
+N-linked glycosylation : http://en.wikipedia.org/wiki/N-linked_glycosylation
+O-linked glycosylation : http://en.wikipedia.org/wiki/O-linked_glycosylation
+
+N-acétylglucosamine (GlcNAc) : http://fr.wikipedia.org/wiki/N-ac%C3%A9tylglucosamine
+
+Acetylation : http://en.wikipedia.org/wiki/Acetylation
+
+Protein–protein interaction : http://en.wikipedia.org/wiki/Protein%E2%80%93protein_interaction
+
+Tandem affinity purification : http://en.wikipedia.org/wiki/Tandem_affinity_purification
+
+Affinity purification-mass spectrometry : http://www.proteomic-basics.eu/2004/kuster_2.pdf
+
+Yeast Two-Hybrid : http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2705515/
+
+Deubiquitinating enzyme : http://en.wikipedia.org/wiki/Deubiquitinating_enzyme
+
+bacterial artificial chromosomes (BACs) : http://en.wikipedia.org/wiki/Bacterial_artificial_chromosome
+Human artificial chromosome : http://en.wikipedia.org/wiki/Human_artificial_chromosome
+Yeast artificial chromosome : http://en.wikipedia.org/wiki/Yeast_artificial_chromosome
+
+Localization and affinity purification (LAP) : http://jura.wi.mit.edu/cheeseman/laptagging.php
+
+epidermal growth factor (EGF) : http://en.wikipedia.org/wiki/Epidermal_growth_factor
+
+Structural maintenance of chromosomes 3 (SMC3): http://en.wikipedia.org/wiki/SMC3
+
+Protein phosphatase 2 (PP2A) : http://en.wikipedia.org/wiki/Protein_phosphatase_2
+
+protein phosphatase methylesterase 1 (PPME1) : http://en.wikipedia.org/wiki/Protein_phosphatase_methylesterase-1
+
+Mothers against decapentaplegic homolog 7 (SMAD7) (MADH7) : http://en.wikipedia.org/wiki/Mothers_against_decapentaplegic_homolog_7
+
+SRY (sex determining region Y)-box 2 (SOX2) : http://en.wikipedia.org/wiki/SOX2
+
+Green Fluorescent Protein (GFP) : http://en.wikipedia.org/wiki/Green_fluorescent_protein
+
+affinity purification–selected reaction monitoring (AP-SRM) : http://www.nature.com/nbt/journal/v29/n7/full/nbt.1905.html
+
+Growth Factor Receptor-Bound Protein 2 (Grb2) : http://en.wikipedia.org/wiki/GRB2
+
+Beta-catenin : http://en.wikipedia.org/wiki/Beta-catenin
+
+Co-Purification : http://en.wikipedia.org/wiki/Copurification
+
+Flow cytometry : http://en.wikipedia.org/wiki/Flow_cytometry
+        Fluorescence-activated cell sorting (FACS) : http://en.wikipedia.org/wiki/Flow_cytometry#Fluorescence-activated_cell_sorting_.28FACS.29
+
+enzyme-linked immunosorbent assay (ELISA) : http://en.wikipedia.org/wiki/ELISA
+
+
