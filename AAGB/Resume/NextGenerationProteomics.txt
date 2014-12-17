@@ -1,0 +1,28 @@
+Résumé de "Next-generation proteomics: towards an integrative view of proteome dynamics"
+
+sujet de la recherch biologie moléculaire : " Understanding how cells function and communicate is one of the fundamental goals in molecular biology"
+
+Un parmi les sujets fondamentale de la recherche du biologie moleculaire, est comprendre comment les cellules functionnent et communicatent.
+
+difficulté: 
+Donc l'analyse des proteines qui sont les clés fonctionnels et collecter les informations au niveau protéomique sont importants mais difficiles,
+
+Global protein analysis poses a tough analytical challenge, in part owing to the highly diverse physicochemical properties of amino acids, which are the building blocks of proteins.
+
+the proteome is complemented by alternative splicing and diverse protein modifications and degradation, and the complexity is further amplified by the interconnectivity of proteins into complexes and signalling networks that are highly divergent in time and space.
+
+Breakthrough: 
+1. " Through recent findings, this dogma has been challenged. Epigenetic marks, alternative splicing, non-coding RNAs (including microRNAs (miRNAs)), protein–protein interaction (PPI) networks and post-translational modifications (PTMs) represent some key examples of how genotype and phenotype are not uniquely directed by information that is present on the genome"
+
+2. sample preparation and computational analysis
+
+now more than 30,000 phosphosites can be quantitatively monitored by MS-based phosphoproteomics
+
+Structure: 
+L'article expose la nouvelle génération proteomique, un séquençage protidique qui permet d'analyser de génome en intégrant des status dynamiques des maladises. La stratégie récente est dévéloppée en bas de Spectrométrie de Masse. Une évolution du dévéloppement des stratégies en bas de MS est présentée. Dans chaque avancement, les améliorations, les avantages et points que l'on a besoin d'encore améliorer sont illustrées, afin de détailler la nouvelle génération proteomique. En fin, l'auteur a cité des applicatoin clinique, ainsi que la conclusion et prévoir.
+
+Mass-spectrometry-based proteomics:
+       La spectrométrie de masse (en anglais, mass spectrometry ou MS) est une technique physique d'analyse permettant de détecter et d'identifier des molécules d’intérêt par mesure de leur masse, et de caractériser leur structure chimique. Son principe réside dans la séparation en phase gazeuse de molécules chargées (ions) en fonction de leur rapport masse/charge (m/z). 
+
+
+
