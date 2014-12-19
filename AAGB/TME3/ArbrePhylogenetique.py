@@ -21,7 +21,6 @@ C = 1 - np.eye(3,3)
 # E est l’ensemble des exons observé pour MAPK8 :
 E = ["a","b","c","d","e","f","g","h","i","I","j","k","l","m","n","o","p","q","z","r","s","t","u"]
 
-
 # 1. Ecrire la fonction exonState qui prend une liste de transcrits et renvoie exS l’état de chaque exon de E dans cette liste.
 
 

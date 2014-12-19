@@ -25,61 +25,60 @@ plan de l'acticle
      high-throughput RNA sequencing
      
 Analyse et augmentation, conclusion
-
+induire fragment d'ions moléculaires en phase gazeuse
 
 Reference:
-
 
 --------------------------------
 Understanding how cells function and communicate is one of the fundamental goals in molecular biology. 
 
 
+Reference : 
 
-
-
-
-Reflechir:
 Le sujet de biologie: 
 http://www.biologycorner.com/bio1/notes_ch1.html#.VIm1fe93KV4
 
 Systems biology:
-http://en.wikipedia.org/wiki/Systems_biology
+ http://en.wikipedia.org/wiki/Systems_biology
 
 Biologie médicale:
-http://fr.wikipedia.org/wiki/Biologie_médicale
+ http://fr.wikipedia.org/wiki/Biologie_médicale
 
 Enzymologie:
-http://fr.wikipedia.org/wiki/Enzymologie
+ http://fr.wikipedia.org/wiki/Enzymologie
 
-ENZYME KINETICS: PRINCIPLES OF CHEMICAL/BIOLOGICAL REACTIONS: 
+PRINCIPLES OF CHEMICAL/BIOLOGICAL REACTIONS: 
 http://people.cst.cmich.edu/baile1re/bio101fall/enzphoto/enzphoto/enzymes/enzstdy.htm
 
 Enzyme et energy:
-http://people.cst.cmich.edu/baile1re/bio101fall/enzphoto/enzphoto/photosy/photnote.htm
+ http://people.cst.cmich.edu/baile1re/bio101fall/enzphoto/enzphoto/photosy/photnote.htm
 
 Techniques de biologie moléculaire:
 http://fr.wikipedia.org/wiki/Techniques_de_biologie_moléculaire
 
-
-==========================================================================================
-
 Spectrométrie de masse : http://fr.wikipedia.org/wiki/Spectrom%C3%A9trie_de_masse
 
 Tandem mass spectrometry : http://en.wikipedia.org/wiki/Tandem_mass_spectrometry
-       Selected reaction monitoring : http://en.wikipedia.org/wiki/Selected_reaction_monitoring
+       - Selected reaction monitoring : http://en.wikipedia.org/wiki/Selected_reaction_monitoring
        
 Chromatographie en phase liquide-spectrométrie de masse : http://fr.wikipedia.org/wiki/Chromatographie_en_phase_liquide-spectrom%C3%A9trie_de_masse
 
 Modification post-traductionnelle: http://fr.wikipedia.org/wiki/Modification_post-traductionnelle
 
 High-performance liquid chromatography(HPLC): http://en.wikipedia.org/wiki/High-performance_liquid_chromatography#Normal_phase_chromatography
-	Hydrophilic interaction liquid chromatography (HILIC) : http://en.wikipedia.org/wiki/Hydrophilic_interaction_chromatography
-	Ion chromatography : http://en.wikipedia.org/wiki/Ion_chromatography
-	Reversed-phase chromatography: http://en.wikipedia.org/wiki/Reversed-phase_chromatography
-	Reversed phase HPLC (RP-HPLC): http://en.wikipedia.org/wiki/High-performance_liquid_chromatography#Reversed-phase_chromatography_.28RPC.29
+	- Hydrophilic interaction liquid chromatography (HILIC) : http://en.wikipedia.org/wiki/Hydrophilic_interaction_chromatography
+	- Ion chromatography : http://en.wikipedia.org/wiki/Ion_chromatography
+	- Reversed-phase chromatography: http://en.wikipedia.org/wiki/Reversed-phase_chromatography
+	- Reversed phase HPLC (RP-HPLC): http://en.wikipedia.org/wiki/High-performance_liquid_chromatography#Reversed-phase_chromatography_.28RPC.29
 	
+Nanoflow LC/IMS-MS and LC/IMS-CID/MS of protein mixtures : http://www.ncbi.nlm.nih.gov/pubmed/15337515
+
+Collision-induced dissociation (CID) : http://en.wikipedia.org/wiki/Collision-induced_dissociation
+
+Electron-transfer dissociation (ETD) : http://en.wikipedia.org/wiki/Electron-transfer_dissociation
+
 Affinity chromatography: http://en.wikipedia.org/wiki/Affinity_chromatography
-	Immobilized metal ion affinity chromatography : http://en.wikipedia.org/wiki/Affinity_chromatography#Immobilized_metal_ion_affinity_chromatography
+	- Immobilized metal ion affinity chromatography : http://en.wikipedia.org/wiki/Affinity_chromatography#Immobilized_metal_ion_affinity_chromatography
 
 Proteogenomics: http://en.wikipedia.org/wiki/Proteogenomics
 
@@ -90,7 +89,7 @@ Induced pluripotent stem cell: http://en.wikipedia.org/wiki/Induced_pluripotent_
 Quantitative proteomics: http://en.wikipedia.org/wiki/Quantitative_proteomics
 
 Fragmentation: http://en.wikipedia.org/wiki/Fragmentation_(chemistry)
-	Electron-transfer dissociation(ETD) : http://en.wikipedia.org/wiki/Electron-transfer_dissociation
+	- Electron-transfer dissociation(ETD) : http://en.wikipedia.org/wiki/Electron-transfer_dissociation
 
 Phosphoproteomics : http://en.wikipedia.org/wiki/Phosphoproteomics
 
