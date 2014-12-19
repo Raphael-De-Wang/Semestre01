@@ -105,7 +105,7 @@ def tranCostTab(costTab, C):
 def isFeuille(A,racine):
     return len( A.successors(racine) ) == 0
     
-def sankUp(A,C,E,racine):
+def sankOff(A,C,E,racine):
     if (isFeuille(A,racine)):
         ec = exonCodant(A.node[racine]['trans'], exonCount(A.node[racine]['trans'], E))
         A.node[racine]['exonState'] = np.array([ [e] for e in ec])
@@ -115,16 +115,19 @@ def sankUp(A,C,E,racine):
             
     else:
         [ cl, cr ] = A.successors(racine)
-        lcostTab  = sankUp(A,C,E,cl)['costTab']
-        rcostTab  = sankUp(A,C,E,cr)['costTab']
+        lcostTab  = sankOff(A,C,E,cl)['costTab']
+        rcostTab  = sankOff(A,C,E,cr)['costTab']
         A.node[racine]['costTab'] = tranCostTab( lcostTab, C) + tranCostTab( rcostTab, C)
         A.node[racine]['exonState']   = np.array([ [ i for i,c in enumerate(cost) if min(cost) == c ] for cost in A.node[racine]['costTab']])
         
     return A.node[racine]
 
-sankUp(G,C,E,racine)
+sankOff(G,C,E,racine)
 
-print G.node[racine]
-
+'''
+for n in G.nodes():
+    print G.node[n]['nName']
+    print G.node[n]['exonState']
+'''
 
 
