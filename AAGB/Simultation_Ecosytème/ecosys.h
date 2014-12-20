@@ -6,6 +6,10 @@
 #define NB_PROIES 20
 #define NB_PREDATEURS 20
 
+#define TRUE  1
+#define FALSE 0
+#define FREE(ptr) if ( (ptr) != NULL ) { free(ptr); ptr = NULL; }
+
 /* Parametres globaux de l'ecosysteme (externes dans le ecosys.h)*/
 
 typedef struct _animal {
@@ -23,6 +27,7 @@ Animal *ajouter_en_tete_animal(Animal *liste,  Animal *animal);
 void enlever_animal(Animal **liste, Animal *animal);
 void liberer_liste_animaux(Animal *liste);
 
+unsigned int compte_animal(Animal *la);
 unsigned int compte_animal_rec(Animal *la);
 unsigned int compte_animal_it(Animal *la);
 Animal *animal_en_XY(Animal *l, int x, int y);
