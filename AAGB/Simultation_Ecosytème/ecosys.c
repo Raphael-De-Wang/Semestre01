@@ -14,10 +14,20 @@ Animal *creer_animal(int x, int y, float energie) {
 
 void enlever_animal(Animal **liste, Animal *animal) {
   if (animal) {
-    animal->precedent->suivant = animal->suivant;
-    animal->suivant->precedent = animal->precedent;
-    animal->precedent = NULL;
-    animal->suivant   = NULL;
+    
+    if (animal->precedent){
+      animal->precedent->suivant = animal->suivant;
+      animal->precedent = NULL;
+    } else {
+      // animal est la tete du liste
+      *liste = animal->suivant;
+    }
+    
+    if (animal->suivant) {
+      animal->suivant->precedent = animal->precedent;
+      animal->suivant   = NULL;
+    }
+    
     FREE(animal);
   }
 }
@@ -28,35 +38,51 @@ void ajouter_animal(int x, int y, float energie, Animal **liste_animal) {
 }
 
 Animal *ajouter_en_tete_animal(Animal *liste,  Animal *animal) {
-  liste->precedent = animal;
-  animal->suivant  = liste;
+  if (liste) {
+    liste->precedent = animal;
+    animal->suivant  = liste;
+  }
+  // if liste est NULL, animal est le nouveau liste
   return animal;
 }
 
 void liberer_liste_animaux(Animal *liste) {
-  Animal *ptr = liste;
-  while(ptr) {
-    ptr = liste->suivant;
-    liste->suivant = NULL;
-    FREE(liste);
+  while(liste) {
+    enlever_animal(&liste, liste);
   }
 }
+
 unsigned int compte_animal(Animal *la) {
   unsigned int count = 0;
-  Animal *ptr = la;
-  while(ptr) {
-    ptr = la->suivant;
+  Animal *ptr = NULL;
+  for ( ptr = la; ptr != NULL; ptr = ptr->suivant ) {
     count++;
   }
   return count;
 }
 
-/****
-unsigned int compte_animal_rec(Animal *la);
-unsigned int compte_animal_it(Animal *la);
-Animal *animal_en_XY(Animal *l, int x, int y);
+unsigned int compte_animal_rec(Animal *la) {
+  return compte_animal(la);
+}
 
-void afficher_ecosys(Animal *liste_predateur, Animal *liste_proie);
+Animal *animal_en_XY(Animal *liste, int x, int y) {
+  Animal *ptr = NULL;
+  for ( ptr = liste; ptr != NULL; ptr = ptr->suivant ) {
+    if (ptr->x == x && ptr->y == y) {
+      return ptr;
+    }
+  }
+  return NULL;
+}
+
+void afficher_ecosys(Animal *liste_predateur, Animal *liste_proie) {
+  
+}
+
+
+
+/****
+unsigned int compte_animal_it(Animal *la);
 
 void rafraichir_predateurs(Animal **liste_predateur, Animal **liste_proie, float d_predateur, float p_ch_dir,  float p_reproduce, float energie,  float p_manger);
 void rafraichir_proies(Animal **liste_proie, float d_proie, float p_ch_dir,  float p_reproduce, float energie);
