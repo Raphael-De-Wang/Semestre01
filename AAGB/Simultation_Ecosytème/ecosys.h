@@ -48,6 +48,7 @@ Animal *animal_en_XY(Animal *liste_animal, int x, int y);
 void localiser_animal(char ecosys[SIZE_Y][SIZE_X], Animal *liste, char animal);
 void init_ecosys(char ecosys[SIZE_Y][SIZE_X]);
 void afficher_ecosys(Animal *liste_predateur, Animal *liste_proie);
+void draw_ecosys(char ecosys[SIZE_Y][SIZE_X]);
 
 void open_screen(void);
 void clear_screen(void);
@@ -63,7 +64,7 @@ void bouger_en_dir (Animal *animal);
 void bouger_animaux(Animal *la, float p_ch_dir);
 void reproduce(Animal **liste_animal, float p_reproduce, float energie);
 void user_energie (Animal **liste_animal, Animal *animal, float d_animal);
-void random_manger (Animal **liste_animal, Animal *animal, float p_manger);
+void random_manger (Animal **liste_proie, Animal *proie, float p_manger);
 
 void rafraichir_predateurs(Animal **liste_predateur, Animal **liste_proie, float d_predateur, float p_ch_dir,  float p_reproduce, float energie,  float p_manger);
 void rafraichir_proies(Animal **liste_proie, float d_proie, float p_ch_dir,  float p_reproduce, float energie);
