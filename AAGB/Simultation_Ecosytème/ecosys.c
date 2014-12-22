@@ -87,10 +87,10 @@ void localiser_animal(char ecosys[SIZE_Y][SIZE_X], Animal *liste, char animal) {
   for (ptr = liste; ptr != NULL; ptr = ptr->suivant) {
     x = ptr->x;
     y = ptr->y;
-    if (ecosys[x][y] == VIDE) {
+    if (ecosys[y][x] == VIDE) {
       ecosys[x][y] = animal;
-    } else if (ecosys[x][y] != animal) {
-      ecosys[x][y] = COEXIST;
+    } else if (ecosys[y][x] != animal) {
+      ecosys[y][x] = COEXIST;
     }
   }
 }
