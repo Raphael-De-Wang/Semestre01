@@ -5,11 +5,8 @@
 #include <time.h>
 #include "ecosys.h"
 
-
 #define NB_PROIES 20
 #define NB_PREDATEURS 20
-
-
 
 int main(void) {
   int i;
@@ -36,18 +33,23 @@ float energie=50;
 
   nb_proies = compte_animal_rec(liste_proie);
   nb_predateurs = compte_animal_rec(liste_predateur);
+  open_screen();
   clear_screen();
-  printf("Nb proies :     %5d\n", nb_proies);
-  printf("Nb predateurs : %5d\n\n", nb_predateurs);
+  //printf("Nb proies :     %5d\n", nb_proies);
+  //printf("Nb predateurs : %5d\n\n", nb_predateurs);
+  write_screan("Nb proies :     %d\n", nb_proies);
+  write_screan("Nb predateurs : %d\n\n", nb_predateurs);
 
   afficher_ecosys(liste_proie,liste_predateur);  
 
   assert(nb_proies == NB_PROIES);
   assert(nb_predateurs == NB_PREDATEURS);
 
+  pose_screen();
+  
   /* Note : libération de la mémoire non demandée dans l'énoncé (et non fournie) */
   liberer_liste_animaux(liste_proie);
   liberer_liste_animaux(liste_predateur);
-
+  close_screen();
   return 0;
 }
