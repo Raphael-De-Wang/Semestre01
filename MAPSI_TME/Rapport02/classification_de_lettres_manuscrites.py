@@ -186,7 +186,7 @@ def main():
     # ---- Biais d'évaluation, notion de sur-apprentissage ----
     trainRes = []
     testRes  = []
-    for d in xrange(3,30):
+    for d in range(3,30):
         modeles = stocker_les_modeles ( d, Xtrain, Ytrain )
         trainRes.append(evaluation_des_performances( discretisation( Xtrain, d ), Ytrain, modeles, d ))
         testRes.append(evaluation_des_performances( discretisation( Xtest,  d ), Ytest, modeles,  d ))
