@@ -43,6 +43,21 @@ def learnMarkovModel ( Xc, d ) :
     Pi /= Pi.sum()
     return (Pi, A)
     
+def learnMarkovModelImpact ( Xc, d ) :
+    A = np.ones((d,d))
+    Pi = np.ones(d)
+
+    for lettre in Xc:
+        Pi[lettre[0]] += 1
+        for i in range( len(lettre) - 1 ):
+            begin = lettre[i]
+            to    = lettre[i+1]
+            A[begin,to] += 1
+        
+    A  /= np.maximum(A.sum(1).reshape(d,1),1) # normalisation
+    Pi /= Pi.sum()
+    return (Pi, A)
+    
 def stocker_les_modeles (d, X, Y) :
     # paramètre de discrétisation
     Xd = discretisation(X,d) # application de la discrétisation
