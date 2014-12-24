@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import copy
 import numpy as np
 import pickle as pkl
@@ -122,7 +121,7 @@ def iSet_to_Y(itrain,itest,X,Y):
     for i in np.concatenate(itest): 
         Xtest.append(X[i])
         Ytest.append(Y[i])
-                
+n                
     for i in np.concatenate(itrain):
         Xtrain.append(X[i])
         Ytrain.append(Y[i])
@@ -140,8 +139,8 @@ def main():
 
     # ---- Biais d'évaluation, notion de sur-apprentissage ----
     for d in xrange(3,30):
-        # modeles = stocker_les_modeles ( d, Xtrain, Ytrain )
-        modeles = stocker_les_modeles ( d, X, Y )
+        modeles = stocker_les_modeles ( d, Xtrain, Ytrain )
+        # modeles = stocker_les_modeles ( d, X, Y )
         evaluation_des_performances( discretisation( Xtest, d ), Ytest, modeles, d )
 
     # ---- Evaluation qualitative ----

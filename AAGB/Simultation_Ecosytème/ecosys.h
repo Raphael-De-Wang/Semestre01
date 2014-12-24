@@ -52,8 +52,8 @@ void draw_ecosys(char ecosys[SIZE_Y][SIZE_X]);
 
 void open_screen(void);
 void clear_screen(void);
-int write_screan(const char *fmt, ...);
-void pose_screen(void);
+int write_screen(const char *fmt, ...);
+int pose_screen(void);
 void close_screen(void);
 
 int random_true_false (float prob);

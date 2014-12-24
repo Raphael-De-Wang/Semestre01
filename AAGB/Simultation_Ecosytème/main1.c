@@ -37,8 +37,8 @@ float energie=50;
   clear_screen();
   //printf("Nb proies :     %5d\n", nb_proies);
   //printf("Nb predateurs : %5d\n\n", nb_predateurs);
-  write_screan("Nb proies :     %d\n", nb_proies);
-  write_screan("Nb predateurs : %d\n\n", nb_predateurs);
+  write_screen("Nb proies :     %d\n", nb_proies);
+  write_screen("Nb predateurs : %d\n\n", nb_predateurs);
 
   afficher_ecosys(liste_proie,liste_predateur);  
 

@@ -88,7 +88,7 @@ void localiser_animal(char ecosys[SIZE_Y][SIZE_X], Animal *liste, char animal) {
     x = ptr->x;
     y = ptr->y;
     if (ecosys[y][x] == VIDE) {
-      ecosys[x][y] = animal;
+      ecosys[y][x] = animal;
     } else if (ecosys[y][x] != animal) {
       ecosys[y][x] = COEXIST;
     }
@@ -106,21 +106,12 @@ void init_ecosys(char ecosys[SIZE_Y][SIZE_X]) {
 
 void draw_ecosys(char ecosys[SIZE_Y][SIZE_X]){
   int x, y;
-  char *ptr = NULL;
-  char *img = (char *)malloc(sizeof(char)*(SIZE_X*2+2));
   for (y = 0; y < SIZE_Y; y++) {
-    ptr = img;
     for (x = 0; x < SIZE_X; x++ ) {
-      memset(ptr,ecosys[y][x],1);
-      ptr++;
-      memset(ptr++,' ',1);
+      write_screen(" %c", ecosys[y][x]);
     }
-    memset(ptr++,'\n',1);
-    memset(ptr,0,1);
-    write_screan(img);
+    write_screen("\n");
   }
-  ptr = NULL;
-  FREE(img);
 }
 
 void afficher_ecosys(Animal *liste_predateur, Animal *liste_proie) {
@@ -139,7 +130,7 @@ void clear_screen(void) {
   erase(); // ncurses lib
 }
 
-int write_screan(const char *fmt, ...) {
+int write_screen(const char *fmt, ...) {
   char printf_buf[1024];
   va_list args;
   int printed;
@@ -151,9 +142,9 @@ int write_screan(const char *fmt, ...) {
   return printed;
 }
 
-void pose_screen(void) {
+int pose_screen(void) {
   printw("\nPress Any Key To CONTINUE: ");
-  getch();  /* Wait for user input */
+  return getch();  /* Wait for user input */
 }
  
 void close_screen(void) {
@@ -161,14 +152,17 @@ void close_screen(void) {
 }
 
 int random_true_false (float prob) {
-  if ( rand() / RAND_MAX > prob) {
-    return TRUE;
+  float randn = rand();
+
+  if ( randn / RAND_MAX > prob) {
+    return FALSE;
   }
-  return FALSE;
+  return TRUE;
 }
 
 int random_dir (void) {
-  if ( rand() / RAND_MAX > 0.5 ) {
+  float randn = rand();
+  if ( randn / RAND_MAX > 0.5 ) {
     return DIR_DOWN;
   }
   return DIR_UP;
@@ -185,19 +179,20 @@ void change_dir (int *dir) {
 void bouger_en_dir (Animal *animal) {
   animal->x += animal->dir[0];
   if (animal->x < 0) {
-    animal->x *= -1;
-    animal->dir[0] *= -1;
-  } else if (animal->x > SIZE_X) {
-    animal->x  = SIZE_X - ( animal->x - SIZE_X );
-    animal->dir[0] *= -1;
+    animal->x = 0;
+    animal->dir[0] = DIR_DOWN;
+  } else if (animal->x >= SIZE_X) {
+    animal->x  = SIZE_X - 1;
+    animal->dir[0] = DIR_UP;
   }
+  
   animal->y += animal->dir[1];
   if (animal->y < 0) {
-    animal->y *= -1;
-    animal->dir[1] *= -1;
-  } else if (animal->y > SIZE_Y) {
-    animal->y  = SIZE_Y - ( animal->y - SIZE_Y );
-    animal->dir[1] *= -1;
+    animal->y = 0;
+    animal->dir[1] = DIR_DOWN;
+  } else if (animal->y >= SIZE_Y) {
+    animal->y  = SIZE_Y - 1;
+    animal->dir[1] = DIR_UP;
   }
 }
 
@@ -236,22 +231,22 @@ void random_manger (Animal **liste_proie, Animal *proie, float p_manger) {
 void rafraichir_predateurs(Animal **liste_predateur, Animal **liste_proie, float d_predateur, float p_ch_dir,  float p_reproduce, float energie,  float p_manger) {
   Animal *predateur = NULL;
   Animal *proie = NULL;
+  reproduce(liste_predateur, p_reproduce, energie);
   for (predateur = *liste_predateur; predateur != NULL; predateur = predateur->suivant) {
     bouger_animaux(predateur, p_ch_dir);
-    reproduce(liste_predateur, p_reproduce, energie);
     proie = animal_en_XY(*liste_proie, predateur->x, predateur->y);
     if (proie) {
       random_manger (liste_proie, proie, p_manger);
     }
     user_energie(liste_predateur, predateur, d_predateur);
-  }
+    }
 }
 
 void rafraichir_proies(Animal **liste_proie, float d_proie, float p_ch_dir,  float p_reproduce, float energie) {
   Animal *ptr = NULL;
+  reproduce(liste_proie, p_reproduce, energie);
   for (ptr = *liste_proie; ptr != NULL; ptr = ptr->suivant) {
     bouger_animaux(ptr, p_ch_dir);
-    reproduce(liste_proie, p_reproduce, energie);
     user_energie(liste_proie, ptr, d_proie);
   }
 }
