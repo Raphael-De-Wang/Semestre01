@@ -175,18 +175,20 @@ def tirer_un_nombre(sigma, mu):
     x[ x < 0 ] = 0
     return x
 
-def dessine(x):
+def dessine(x,cname=None):
     # pour afficher le vecteur des moyennes des pixels pour le modèle 0:
-    plt.figure()
+    fig = plt.figure()
     plt.imshow(x.reshape(16,16), cmap = cm.Greys_r, interpolation='nearest')
-    plt.show()
+    if cname == None:
+        plt.show()
+    else:
+        plt.savefig(cname)
 
-def nombre_genere(X,Y):
-    nombre= 2
+def nombre_genere(X,Y,nombre):
     mu    = learn_mu(X,Y,nombre)
     var   = learn_std(X,Y,nombre)
     x     = tirer_un_nombre(var, mu)
-    dessine(x)
+    dessine(x,"%s_generatif"%nombre)
     
 def modele_discriminant(X, Y, nombre):
     nom_iter = 120
@@ -194,7 +196,7 @@ def modele_discriminant(X, Y, nombre):
     y = Y[Y==nombre]
     x = X[Y==nombre]
     thetaRL = apprendre_classifieurs( x, y, nom_iter, epsilon)
-    dessine(np.array(thetaRL[0][0]))
+    dessine(np.array(thetaRL[0][0]),"%s_discriminant"%nombre)
 
 # modele_discriminant(X, Y, 2)
 
@@ -238,6 +240,7 @@ def ambigus_proche(X, models, seuil):
 #### Rapport 02 ####
 def dessine_modeles_discriminants(X,Y):
     for chiffre in range(10):
+        nombre_genere(X,Y,chiffre)
         modele_discriminant(X, Y, chiffre)
     
 dessine_modeles_discriminants(X,Y)
