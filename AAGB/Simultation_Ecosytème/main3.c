@@ -63,7 +63,7 @@ int main(void) {
     write_screen("Nb proies :     %d\n", nb_proies);
     write_screen("Nb predateurs : %d\n\n", nb_predateurs);
     
-    sb_use = sprintf(sb, "%d %d %d\n", count, nb_proies, nb_proies);
+    sb_use = sprintf(sb, "%d %d %d\n", count, nb_proies, nb_predateurs);
     fwrite(sb, sizeof(char), sb_use, fp);
 
     afficher_ecosys(liste_proie,liste_predateur);
