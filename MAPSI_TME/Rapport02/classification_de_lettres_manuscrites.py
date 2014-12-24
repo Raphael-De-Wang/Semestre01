@@ -121,7 +121,7 @@ def iSet_to_Y(itrain,itest,X,Y):
     for i in np.concatenate(itest): 
         Xtest.append(X[i])
         Ytest.append(Y[i])
-n                
+                
     for i in np.concatenate(itrain):
         Xtrain.append(X[i])
         Ytrain.append(Y[i])
