@@ -203,7 +203,7 @@ def passe_borne(X, models, seuil):
 def ambigus_proche(X, models, seuil):
     p = []
     for i in range(len(X)):
-        vrais = heapq.nlargest(1, [ f( X[i], mdl[0], mdl[1] ) for mdl in models ] )
+        vrais = heapq.nlargest(2, [ f( X[i], mdl[0], mdl[1] ) for mdl in models ] )
         p.append(vrais[0] - vrais[1] < seuil)
     return p
 
@@ -233,15 +233,21 @@ def evaluer_modeles_discriminants_echantillons_regule(X,Y,XT,YT,CALLBACK):
 
 # evaluer_modeles_discriminants_echantillons_regule(X,Y,passe_borne)
 # evaluer_modeles_discriminants_echantillons_regule(X,Y,ambigus_proche)
-
+'''
 models  = apprendre_classifieurs( X, Y )
 np.save("models", models)
-
+'''
+'''
+models = np.load("models.npy")
+seuil  = 0.5
 (Xp,Yp) = rejet_echantillons_ambigus(X,Y,models,seuil,passe_borne)
 models2 = apprendre_classifieurs( Xp, Yp )
-np.save("models2",models2)
+np.save("models[passe_borne,seuil=0.5]",models2)
+'''
 
+models = np.load("models.npy")
+seuil  = 0.5
 (Xa,Ya) = rejet_echantillons_ambigus(X,Y,models,seuil,ambigus_proche)
 models3 = apprendre_classifieurs( Xa, Ya )
-np.save("models3",models3)
+np.save("models[ambigus_proche,seuil=0.5]",models3)
 
