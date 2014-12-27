@@ -104,7 +104,6 @@ def apprendre_classifieurs( X, Y, nom_iter=120, epsilon=.00005):
     for NOMBRE in range(len(np.unique(Y))):
         # Pour transformer le vecteur Y afin de traiter la classe NOMBRE:
         print "NOMBRE: ", NOMBRE
-        print "b: ",b
         Yc      = class_vecteur(Y,NOMBRE)
         thetaRL.append(regression_logistique( X, Yc, w, b, epsilon, nom_iter))
 
@@ -226,11 +225,14 @@ def dessine_modeles_discriminants(X,Y):
 
 def evaluer_modeles_discriminants_echantillons_regule(X,Y,XT,YT,CALLBACK):
     models  = apprendre_classifieurs( X, Y )
-
+    np.save("models", models)
     
     (Xp,Yp) = rejet_echantillons_ambigus(X,Y,models,seuil,CALLBACK)
     models2 = apprendre_classifieurs( Xp, Yp )
+    np.save("models2",models2)
 
 # evaluer_modeles_discriminants_echantillons_regule(X,Y,passe_borne)
 # evaluer_modeles_discriminants_echantillons_regule(X,Y,ambigus_proche)
+models  = apprendre_classifieurs( X, Y )
+np.save("models", models)
 
