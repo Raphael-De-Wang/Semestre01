@@ -100,19 +100,23 @@ def separeTrainTest(y, pc):
         indTest.append(np.setdiff1d(ind, indTrain[-1]))
     return indTrain, indTest
 
-def evaluation_qualitative( X, Y, group, models):
+def evaluation_qualitative( X, Y, group, models, d=None):
     conf = np.zeros((26,26))
     for i, cls in enumerate(group):
         for echantillon in cls:
             conf[i, np.argmax([ probaSeq( X[echantillon], mdl[0], mdl[1] ) for mdl in models ]) ] += 1
-    plt.figure()
+    fig = plt.figure()
     plt.imshow(conf, interpolation='nearest')
     plt.colorbar()
     plt.xticks(np.arange(26),np.unique(Y))
     plt.yticks(np.arange(26),np.unique(Y))
     plt.xlabel(u'Vérité terrain')
     plt.ylabel(u'Prédiction')
-    plt.savefig("mat_conf_lettres.png")
+    if d == None:
+        plt.savefig("evaluation_qualitative.png")
+    else:
+        plt.savefig("evaluation_qualitative(d=%d).png"%d)
+    plt.close(fig)
 
 def random_nombre ():
     return np.random.rand()
@@ -161,16 +165,19 @@ def iat (itrain, itest, Y_indice) :
 
     return ( ia_x, ia_y, it_x, it_y )
 
-def trace_comp(trainRes, testRes):
-    plt.figure()
+def trace_comp(trainRes, testRes, x_borne=None, y_borne=None):
+    fig = plt.figure()
     if len(trainRes) != len(testRes):
         raise("InvalidDataSet")
-    
+    if x_borne != None:
+        plt.xlim(x_borne[0],x_borne[1])
+    if y_borne != None:
+        plt.xlim(y_borne[0],y_borne[1])
     plt.plot(range(len(trainRes)), trainRes, label='Train')
     plt.plot(range(len(testRes)),  testRes,  label='Test')
     plt.legend()
-    plt.savefig("comparation.png")
-    
+    plt.savefig("comparation_performance_train_test.png")
+    plt.close(fig)
     
 def main():
     # ---- Classification de lettres manuscrites ----
@@ -186,19 +193,17 @@ def main():
     # ---- Biais d'évaluation, notion de sur-apprentissage ----
     trainRes = []
     testRes  = []
-    for d in range(3,30):
+    for d in range(3,31):
         modeles = stocker_les_modeles ( d, Xtrain, Ytrain )
         trainRes.append(evaluation_des_performances( discretisation( Xtrain, d ), Ytrain, modeles, d ))
         testRes.append(evaluation_des_performances( discretisation( Xtest,  d ), Ytest, modeles,  d ))
-    trace_comp(trainRes, testRes)
-    
-    # ---- Evaluation qualitative ----
-    d = 20
-    modeles = stocker_les_modeles ( d, X, Y )
-    evaluation_qualitative( discretisation( X, d ), it_y, itest, modeles)
+        # ---- Evaluation qualitative ----
+        evaluation_qualitative( discretisation( X, d ), it_y, itest, modeles, d)
+    trace_comp(trainRes, testRes, (3, 30))
 
     # ---- Modèle génératif ----
-    d = 20
+    '''
+    d = 12
     modeles = stocker_les_modeles ( d, X, Y )
     alph = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
     for lettre in range(len(alph)):
@@ -206,6 +211,6 @@ def main():
         intervalle = 360./d # pour passer des états => valeur d'angles
         newa_continu = np.array([i*intervalle for i in newa]) # conv int => double
         tracerLettre(newa_continu, alph[lettre])
-    
+    '''
 if __name__ == "__main__":
     main()
