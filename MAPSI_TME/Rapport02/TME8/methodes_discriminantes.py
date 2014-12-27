@@ -233,6 +233,15 @@ def evaluer_modeles_discriminants_echantillons_regule(X,Y,XT,YT,CALLBACK):
 
 # evaluer_modeles_discriminants_echantillons_regule(X,Y,passe_borne)
 # evaluer_modeles_discriminants_echantillons_regule(X,Y,ambigus_proche)
+
 models  = apprendre_classifieurs( X, Y )
 np.save("models", models)
+
+(Xp,Yp) = rejet_echantillons_ambigus(X,Y,models,seuil,passe_borne)
+models2 = apprendre_classifieurs( Xp, Yp )
+np.save("models2",models2)
+
+(Xa,Ya) = rejet_echantillons_ambigus(X,Y,models,seuil,ambigus_proche)
+models3 = apprendre_classifieurs( Xa, Ya )
+np.save("models3",models3)
 
