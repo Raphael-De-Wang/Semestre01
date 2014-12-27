@@ -193,19 +193,17 @@ def modele_discriminant_optimisation(X,Y,lv,nombre,epsilon=.00005,gd=0.01):
     return regression_logistique_optimal( X, Yc, w, b, lv, epsilon, gd)
 
 # Mettre en place une stratégie de rejet des échantillons ambigus: étudier l'amélioration des résultats en fonction du nombre d'échantillon rejetés. Etudier en particulier les cas suivants:
-def rejet_echantillons_ambigus(X,Y,models,seuil,CALLBACK):
-    indice = CALLBACK(X, models, seuil)
-    return (X[indice], Y[indice])
+def passe_borne(X, Y, models, seuil):
+    p = np.array([ max([ f( X[i], mdl[0], mdl[1] ) for mdl in models ]) for i in range(len(X)) ])
+    return X[p>seuil], Y[p>seuil]
 
-def passe_borne(X, models, seuil):
-    return [ max([ f( X[i], mdl[0], mdl[1] ) for mdl in models ]) > seuil for i in range(len(X)) ]
-
-def ambigus_proche(X, models, seuil):
+def ambigus_proche(X, Y, models, seuil):
     p = []
     for i in range(len(X)):
         vrais = heapq.nlargest(2, [ f( X[i], mdl[0], mdl[1] ) for mdl in models ] )
-        p.append(vrais[0] - vrais[1] < seuil)
-    return p
+        p.append(vrais[0] - vrais[1])
+    p = np.array(p)
+    return X[p>seuil], Y[p>seuil]
 
 #### Rapport 02 ####
 '''
@@ -223,31 +221,34 @@ def dessine_modeles_discriminants(X,Y):
 # dessine_modeles_discriminants(X,Y)
 '''
 
-def evaluer_modeles_discriminants_echantillons_regule(X,Y,XT,YT,CALLBACK):
-    models  = apprendre_classifieurs( X, Y )
-    np.save("models", models)
-    
-    (Xp,Yp) = rejet_echantillons_ambigus(X,Y,models,seuil,CALLBACK)
-    models2 = apprendre_classifieurs( Xp, Yp )
-    np.save("models2",models2)
-
-# evaluer_modeles_discriminants_echantillons_regule(X,Y,passe_borne)
-# evaluer_modeles_discriminants_echantillons_regule(X,Y,ambigus_proche)
 '''
 models  = apprendre_classifieurs( X, Y )
 np.save("models", models)
 '''
-'''
-models = np.load("models.npy")
-seuil  = 0.5
-(Xp,Yp) = rejet_echantillons_ambigus(X,Y,models,seuil,passe_borne)
-models2 = apprendre_classifieurs( Xp, Yp )
-np.save("models[passe_borne,seuil=0.5]",models2)
-'''
 
+def evaluer_passe_borne(X,Y,models):
+    for seuil in np.linspace(0,1,11):
+        (Xp,Yp) = passe_borne(X,Y,models,seuil)
+        print "---- Seuil = %f ----"%seuil
+        if len(Y) == len(Yp):
+            continue
+        if len(np.unique(Y)) != len(np.unique(Yp)):
+            continue
+        models2 = apprendre_classifieurs( Xp, Yp )
+        np.save("models[passe_borne,seuil=%f]"%seuil,models2)
+
+def evaluer_ambigus_proche(X,Y,models):
+    for seuil in np.linspace(1,0,11):
+        (Xa,Ya) = ambigus_proche(X,Y,models,seuil)
+        print "---- Seuil = %f ----"%seuil
+        if len(Y) == len(Ya):
+            continue
+        if len(np.unique(Y)) != len(np.unique(Ya)):
+            continue
+        models3 = apprendre_classifieurs( Xa, Ya )
+        np.save("models[ambigus_proche,seuil=%f]"%seuil,models3)
+    
 models = np.load("models.npy")
-seuil  = 0.5
-(Xa,Ya) = rejet_echantillons_ambigus(X,Y,models,seuil,ambigus_proche)
-models3 = apprendre_classifieurs( Xa, Ya )
-np.save("models[ambigus_proche,seuil=0.5]",models3)
+evaluer_passe_borne(X,Y,models)
+# evaluer_ambigus_proche(X,Y,models)
 
