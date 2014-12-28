@@ -104,6 +104,7 @@ def apprendre_classifieurs( X, Y, nom_iter=120, epsilon=.00005):
     for NOMBRE in range(len(np.unique(Y))):
         # Pour transformer le vecteur Y afin de traiter la classe NOMBRE:
         print "NOMBRE: ", NOMBRE
+        print "w[0], b", w[0], b
         Yc      = class_vecteur(Y,NOMBRE)
         thetaRL.append(regression_logistique( X, Yc, w, b, epsilon, nom_iter))
 
@@ -248,7 +249,7 @@ def evaluer_ambigus_proche(X,Y,models):
         models3 = apprendre_classifieurs( Xa, Ya )
         np.save("models[ambigus_proche,seuil=%f]"%seuil,models3)
     
-models = np.load("models.npy")
-evaluer_passe_borne(X,Y,models)
+# models = np.load("models.npy")
+# evaluer_passe_borne(X,Y,models)
 # evaluer_ambigus_proche(X,Y,models)
 

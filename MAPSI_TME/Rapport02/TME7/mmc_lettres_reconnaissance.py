@@ -346,17 +346,14 @@ def main():
         testVarRes   = []
         for K in range(5,26):
             modeles = baum_welch_simplifie( [], Xtrain, Ytrain, N, K, initTo0)
-            time.sleep(10)
             (mean,var) = evaluation_des_performances( discretisation( Xtrain, K ), Ytrain, modeles, N, K, "Train")
             trainMeanRes.append(mean)
             # ---- Biais-Variance ----
             trainVarRes.append(var)
-            time.sleep(5)
             (mean,var) = evaluation_des_performances( discretisation( Xtest,  K ), Ytest, modeles, N, K, "Test")
             testMeanRes.append(mean)
             # ---- Biais-Variance ----
             testVarRes.append(var)
-            time.sleep(5)
             # ---- Evaluation qualitative ----
             evaluation_qualitative( discretisation( X, K ), it_y, itest, modeles, N, K)
 
