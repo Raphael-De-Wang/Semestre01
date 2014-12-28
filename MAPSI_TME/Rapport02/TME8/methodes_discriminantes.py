@@ -4,6 +4,7 @@ import math
 import heapq
 import numpy as np
 import pickle as pkl
+import os.path as op
 
 # fonction de suppression des 0 (certaines variances sont nulles car les pixels valent tous la même chose)
 def woZeros(x): 
@@ -229,8 +230,10 @@ np.save("models", models)
 
 def evaluer_passe_borne(X,Y,models):
     for seuil in np.linspace(0,1,11):
+        print "---- passe_borne Seuil = %f ----"%seuil
+        if op.exists("models[passe_borne,seuil=%f].npy"%seuil):
+            continue
         (Xp,Yp) = passe_borne(X,Y,models,seuil)
-        print "---- Seuil = %f ----"%seuil
         if len(Y) == len(Yp):
             continue
         if len(np.unique(Y)) != len(np.unique(Yp)):
@@ -240,8 +243,10 @@ def evaluer_passe_borne(X,Y,models):
 
 def evaluer_ambigus_proche(X,Y,models):
     for seuil in np.linspace(1,0,11):
+        print "---- ambigus_proche Seuil = %f ----"%seuil
+        if op.exists("models[ambigus_proche,seuil=%f].npy"%seuil):
+            continue
         (Xa,Ya) = ambigus_proche(X,Y,models,seuil)
-        print "---- Seuil = %f ----"%seuil
         if len(Y) == len(Ya):
             continue
         if len(np.unique(Y)) != len(np.unique(Ya)):
@@ -249,7 +254,7 @@ def evaluer_ambigus_proche(X,Y,models):
         models3 = apprendre_classifieurs( Xa, Ya )
         np.save("models[ambigus_proche,seuil=%f]"%seuil,models3)
     
-# models = np.load("models.npy")
+models = np.load("models.npy")
 # evaluer_passe_borne(X,Y,models)
-# evaluer_ambigus_proche(X,Y,models)
+evaluer_ambigus_proche(X,Y,models)
 
