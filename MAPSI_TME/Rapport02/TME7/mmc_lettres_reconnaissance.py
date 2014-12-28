@@ -2,11 +2,10 @@
 import time
 import numpy as np
 import pickle as pkl
-import matplotlib.pyplot as plt
 
 # truc pour un affichage plus convivial des matrices numpy
 np.set_printoptions(precision=2, linewidth=320)
-plt.close('all')
+# plt.close('all')
 alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
     
 def load_data(fname):
@@ -17,7 +16,6 @@ def load_data(fname):
     return data, X, Y, nCl
     
 data, X, Y, nCl = load_data('TME6_lettres.pkl')
-
 
 #### Apprentissage d'un modèle connaissant les états ####
 def discretisation( X, n_etats = 10 ) :
@@ -151,22 +149,6 @@ def baum_welch_simplifie( lv_lst, X, Y, N = 5, K = 10, initTo0=True):
                 
     return alpha
 
-def tracer_evolution_vraisemblance(lv_list):
-    fig = plt.figure()
-    x = range(len(lv_list))
-    y = lv_list
-    plt.plot( x, y )
-    plt.xlabel("Nombre d'Iteration")
-    plt.ylabel("Log Vraisemblance")
-    plt.savefig("vraisemblance_regression.png")
-    
-
-'''
-lv_lst = []
-baum_welch_simplifie( lv_lst, X, Y,)
-tracer_evolution_vraisemblance(lv_lst)
-'''
-
 # Evaluation des performances
 def groupByLabel( y ) :
     index = []
@@ -205,15 +187,7 @@ def evaluation_qualitative( X, Y, group, models, N = 5, K = 10):
     for i, cls in enumerate(group):
         for echantillon in cls:
             conf[i, np.argmax([ viterbi( Xd[echantillon], mdl[0], mdl[1], mdl[2] )[0] for mdl in models ]) ] += 1
-                
-    plt.figure()
-    plt.imshow(conf, interpolation='nearest')
-    plt.colorbar()
-    plt.xticks(np.arange(26),np.unique(Y))
-    plt.yticks(np.arange(26),np.unique(Y))
-    plt.xlabel(u'Vérité terrain')
-    plt.ylabel(u'Prédiction')
-    plt.savefig("evaluation_qualitative(N=%d,K=%d).png"%(N,K))
+    np.save("evaluation_qualitative_conf[N=%d,K=%d]"%(N,K),conf)
     
 #### Génération de lettres ####
 # Comme dans le TME précédent, proposer une procédure de génération de lettres.
@@ -234,48 +208,6 @@ def generateHMM(Pic, Ac, Bc, longeur):
         x.append(random_prendre(Bc[s[i+1]]))
 
     return s,x
-
-# affichage d'une lettre (= vérification bon chargement)
-def tracerLettre(let):
-    a = -let*np.pi/180;
-    coord = np.array([[0, 0]]);
-    for i in range(len(a)):
-        x = np.array([[1, 0]]);
-        rot = np.array([[np.cos(a[i]), -np.sin(a[i])],[ np.sin(a[i]),np.cos(a[i])]])
-        xr = x.dot(rot) # application de la rotation
-        coord = np.vstack((coord,xr+coord[-1,:]))
-    plt.plot(coord[:,0],coord[:,1])
-
-# Faire tourner le code suivant qui réalise la génération de n échantillon pour nClred classes de lettres
-def test( X, Y, models, N = 5, K = 10):
-    #Trois lettres générées pour 5 classes (A -> E)
-    n      = 3          # nb d'échantillon par classe
-    nClred = 5   # nb de classes à considérer
-    d      = K
-    Xd     = discretisation(X,K)
-    itrain = groupByLabel(Y)
-    fig    = plt.figure()
-    
-    for cl in xrange(nClred):
-        Pic = models[cl][0].cumsum() # calcul des sommes cumulées pour gagner du temps
-        Ac  = models[cl][1].cumsum(1)
-        Bc  = models[cl][2].cumsum(1)
-        longeur = np.floor(np.array([len(x) for x in Xd[itrain[cl]]]).mean()) # longueur de seq. à générer = moyenne des observations
-        for im in range(n):
-            s,x = generateHMM(Pic, Ac, Bc, int(longeur))
-            intervalle = 360./d  # pour passer des états => angles
-            newa_continu = np.array([i*intervalle for i in x]) # conv int => double
-            sfig = plt.subplot(nClred,n,im+n*cl+1)
-            sfig.axes.get_xaxis().set_visible(False)
-            sfig.axes.get_yaxis().set_visible(False)
-            tracerLettre(newa_continu)
-            plt.savefig("lettres_hmm.png")
-'''
-lv_lst = []
-models = baum_welch_simplifie( lv_lst, X, Y,)
-evaluation_qualitative( X, Y, groupByLabel(Y), models)
-'''
-# test(X, Y, models)
 
 #### Rapport 02 ####
 
@@ -310,20 +242,6 @@ def iat (itrain, itest, Y_indice) :
 
     return ( ia_x, ia_y, it_x, it_y )
 
-def trace_comp(trainMeanRes, trainVarRes, testMeanRes, testVarRes, N, x_borne=None, y_borne=None):
-    fig = plt.figure()
-    if x_borne != None:
-        plt.xlim(x_borne[0],x_borne[1])
-    if y_borne != None:
-        plt.xlim(y_borne[0],y_borne[1])
-    plt.plot(range(len(trainMeanRes)), trainRes, label='Train Mean')
-    plt.plot(range(len(trainVarRes)), trainRes, label='Train Variance')
-    plt.plot(range(len(testMeanRes)),  testRes,  label='Test Mean')
-    plt.plot(range(len(testVarRes)),  testRes,  label='Test Variance')
-    plt.legend()
-    plt.savefig("comparation_performance_train_test[N=%d].png"%N)
-    plt.close(fig)
-    
 def main():
     data = pkl.load(file("TME6_lettres.pkl","rb"))
     X = np.array(data.get('letters')) # récupération des données sur les lettres
@@ -346,18 +264,20 @@ def main():
         testVarRes   = []
         for K in range(5,26):
             modeles = baum_welch_simplifie( [], Xtrain, Ytrain, N, K, initTo0)
+            # ---- Biais-Variance et Mean----
             (mean,var) = evaluation_des_performances( discretisation( Xtrain, K ), Ytrain, modeles, N, K, "Train")
             trainMeanRes.append(mean)
-            # ---- Biais-Variance ----
             trainVarRes.append(var)
+            # ---- Biais-Variance et Mean----
             (mean,var) = evaluation_des_performances( discretisation( Xtest,  K ), Ytest, modeles, N, K, "Test")
             testMeanRes.append(mean)
-            # ---- Biais-Variance ----
             testVarRes.append(var)
             # ---- Evaluation qualitative ----
-            evaluation_qualitative( discretisation( X, K ), it_y, itest, modeles, N, K)
+            # evaluation_qualitative( discretisation( X, K ), it_y, itest, modeles, N, K)
+            np.save("modeles[N=%d,K=%d]"%(N,K),modeles)
 
-        trace_comp(trainMeanRes, trainVarRes, testMeanRes, testVarRes, N, (5,25))
+        np.save("trainMean_trainVar_testMean_testVar[N=%d,K=(%d,%d)]"%(N,5,25), [trainMeanRes, trainVarRes, testMeanRes, testVarRes])
+        # trace_comp(trainMeanRes, trainVarRes, testMeanRes, testVarRes, N, (5,25))
     
     # ---- Modèle génératif ----
     '''

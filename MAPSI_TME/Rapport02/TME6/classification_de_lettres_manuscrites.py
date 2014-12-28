@@ -132,7 +132,12 @@ def generate( Pi, A, n ):
     a  = np.array([ i.cumsum() for i in A ])
     newa = [ tirage_selon_loi_sc( pi, random_nombre() ) ]
     for i in range( n - 1 ):
-        newa += [ tirage_selon_loi_sc( a[newa[i-1]], random_nombre() ) ]
+        try:
+            newa += [ tirage_selon_loi_sc( a[newa[-1]], random_nombre() ) ]
+        except:
+            print i
+            print newa
+            raise
     return np.array(newa)
 
 def iSet_to_Y(ia,X,Y):
@@ -192,26 +197,29 @@ def main():
     Y_indice = np.unique(Y)
     ( ia_x, ia_y, it_x, it_y ) = iat (itrain, itest, Y_indice)
     # ---- Biais d'évaluation, notion de sur-apprentissage ----
+    '''
     trainRes = []
     testRes  = []
-    for d in range(3,31):
+    for d in range(3,41):
         modeles = stocker_les_modeles ( d, Xtrain, Ytrain )
         trainRes.append(evaluation_des_performances( discretisation( Xtrain, d ), Ytrain, modeles, d ))
         testRes.append(evaluation_des_performances( discretisation( Xtest,  d ), Ytest, modeles,  d ))
         # ---- Evaluation qualitative ----
         evaluation_qualitative( discretisation( X, d ), it_y, itest, modeles, d)
-    trace_comp(trainRes, testRes, (3, 30))
-
-    # ---- Modèle génératif ----
+    trace_comp(trainRes, testRes, (3, 40))
     '''
-    d = 12
+    # ---- Modèle génératif ----
+    d = 16
     modeles = stocker_les_modeles ( d, X, Y )
     alph = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
+    xlens = np.array([ len(x) for x in X ])
+    len_moy = int(xlens.mean())
+    print len_moy
     for lettre in range(len(alph)):
-        newa = generate(modeles[lettre][0],modeles[lettre][1], 25) # generation d'une séquence d'états
+        newa = generate(modeles[lettre][0],modeles[lettre][1], len_moy) # generation d'une séquence d'états
         intervalle = 360./d # pour passer des états => valeur d'angles
         newa_continu = np.array([i*intervalle for i in newa]) # conv int => double
         tracerLettre(newa_continu, alph[lettre])
-    '''
+
 if __name__ == "__main__":
     main()
