@@ -255,6 +255,6 @@ def evaluer_ambigus_proche(X,Y,models):
         np.save("models[ambigus_proche,seuil=%f]"%seuil,models3)
     
 models = np.load("models.npy")
-# evaluer_passe_borne(X,Y,models)
-evaluer_ambigus_proche(X,Y,models)
+evaluer_passe_borne(X,Y,models)
+# evaluer_ambigus_proche(X,Y,models)
 
