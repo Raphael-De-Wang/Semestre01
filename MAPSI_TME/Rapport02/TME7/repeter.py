@@ -2,11 +2,9 @@
 import time
 import numpy as np
 import pickle as pkl
-import matplotlib.pyplot as plt
 
 # truc pour un affichage plus convivial des matrices numpy
 np.set_printoptions(precision=2, linewidth=320)
-plt.close('all')
 alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
     
 def load_data(fname):
@@ -16,8 +14,6 @@ def load_data(fname):
     nCl = 26
     return data, X, Y, nCl
     
-data, X, Y, nCl = load_data('TME6_lettres.pkl')
-
 #### Apprentissage d'un modèle connaissant les états ####
 def discretisation( X, n_etats = 10 ) :
     intervalle = 360. / n_etats
@@ -120,7 +116,7 @@ def calc_log_probs_v2(x, Pi, A, B):
 #### Apprentissage complet (Baum-Welch simplifié) ####
 
 # apprendre les modèles correspondant aux 26 lettres de l'alphabet.
-def baum_welch_simplifie( lv_lst, X, Y, N = 5, K = 10, initTo0=True):
+def baum_welch_simplifie( lv_lst, X, Y, N = 5, K = 10):
     # 1. Initialisation des états cachés arbitraire (eg méthode gauche-droite)
     nom_iter = 0
     alpha    = []
@@ -137,7 +133,7 @@ def baum_welch_simplifie( lv_lst, X, Y, N = 5, K = 10, initTo0=True):
         alpha     = []
         for lettre in alphabet:
             # 1. Apprentissage des modèles
-            ( Pi, A, B ) = learnHMM( Xd[Y==lettre], q[Y==lettre], N, K, initTo0)
+            ( Pi, A, B ) = learnHMM( Xd[Y==lettre], q[Y==lettre], N, K)
             # print "nom_iter: %d"%nom_iter, B
             alpha.append((Pi,A,B))
             # 2. Estimation des états cachés par Viterbi
@@ -147,23 +143,8 @@ def baum_welch_simplifie( lv_lst, X, Y, N = 5, K = 10, initTo0=True):
                 lv  += p_est
                 
         lv_lst.append(lv)
+                
     return alpha
-
-def tracer_evolution_vraisemblance(lv_list):
-    fig = plt.figure()
-    x = range(len(lv_list))
-    y = lv_list
-    plt.plot( x, y )
-    plt.xlabel("Nombre d'Iteration")
-    plt.ylabel("Log Vraisemblance")
-    plt.savefig("vraisemblance_regression.png")
-    plt.close(fig)
-
-'''
-lv_lst = []
-baum_welch_simplifie( lv_lst, X, Y,)
-tracer_evolution_vraisemblance(lv_lst)
-'''
 
 # Evaluation des performances
 def groupByLabel( y ) :
@@ -185,38 +166,19 @@ def separeTrainTest(y, pc):
     return indTrain, indTest
 
 # Evaluer les performances sur les données de test.
-def evaluation_des_performances( Xd, Y, models, N, K, commantaire="" ):
+def evaluation_des_performances( Xd, Y, models, d ):
     proba = np.array([ [ viterbi( Xd[i], models[cl][0], models[cl][1], models[cl][2])[0] for i in range( len(Xd) ) ] for cl in range( len( np.unique(Y) ) ) ])
     Ynum = np.zeros(Y.shape)
     for num,char in enumerate(np.unique(Y)):
         Ynum[Y==char] = num
     pred = proba.argmax(0) # max colonne par colonne
-    resultat = np.where(pred != Ynum, 0.,1.)
-    mean = resultat.mean()
-    var  = resultat.var()
-    print 'Evaluation Des Performances Résultat [N=%d,K=%d]%s: '%(N,K,commantaire), mean
-    return (mean, var)
+    resultat = np.where(pred != Ynum, 0.,1.).mean()
+    var      = np.where(pred != Ynum, 0.,1.).var()
+    print 'Evaluation Des Performances Résultat [%d]: '%d, resultat
+    return resultat,var
 
-def evaluation_qualitative( X, Y, group, models, N = 5, K = 10):
-    conf = np.zeros((26,26))
-    Xd   = discretisation(X,K)
-    for i, cls in enumerate(group):
-        for echantillon in cls:
-            conf[i, np.argmax([ viterbi( Xd[echantillon], mdl[0], mdl[1], mdl[2] )[0] for mdl in models ]) ] += 1
-                
-    fig = plt.figure()
-    plt.imshow(conf, interpolation='nearest')
-    plt.colorbar()
-    plt.xticks(np.arange(26),np.unique(Y))
-    plt.yticks(np.arange(26),np.unique(Y))
-    plt.xlabel(u'Vérité terrain')
-    plt.ylabel(u'Prédiction')
-    plt.savefig("evaluation_qualitative(N=%d,K=%d).png"%(N,K))
-    plt.close(fig)
-    
 #### Génération de lettres ####
 # Comme dans le TME précédent, proposer une procédure de génération de lettres.
-
 # Donner le code de generateHMM qui génère une séquence d'observations (et une séquence d'états) à partir des sommes cumulées des modèles de lettres (cf usage ci-dessous)
 
 def random_prendre(distProbs):
@@ -233,49 +195,6 @@ def generateHMM(Pic, Ac, Bc, longeur):
         x.append(random_prendre(Bc[s[i+1]]))
 
     return s,x
-
-# affichage d'une lettre (= vérification bon chargement)
-def tracerLettre(let):
-    a = -let*np.pi/180;
-    coord = np.array([[0, 0]]);
-    for i in range(len(a)):
-        x = np.array([[1, 0]]);
-        rot = np.array([[np.cos(a[i]), -np.sin(a[i])],[ np.sin(a[i]),np.cos(a[i])]])
-        xr = x.dot(rot) # application de la rotation
-        coord = np.vstack((coord,xr+coord[-1,:]))
-    plt.plot(coord[:,0],coord[:,1])
-
-# Faire tourner le code suivant qui réalise la génération de n échantillon pour nClred classes de lettres
-def test( X, Y, models, N = 5, K = 10):
-    #Trois lettres générées pour 5 classes (A -> E)
-    n      = 3          # nb d'échantillon par classe
-    nClred = 5   # nb de classes à considérer
-    d      = K
-    Xd     = discretisation(X,K)
-    itrain = groupByLabel(Y)
-    
-    for cl in xrange(nClred):
-        Pic = models[cl][0].cumsum() # calcul des sommes cumulées pour gagner du temps
-        Ac  = models[cl][1].cumsum(1)
-        Bc  = models[cl][2].cumsum(1)
-        longeur = np.floor(np.array([len(x) for x in Xd[itrain[cl]]]).mean()) # longueur de seq. à générer = moyenne des observations
-        for im in range(n):
-            s,x = generateHMM(Pic, Ac, Bc, int(longeur))
-            intervalle = 360./d  # pour passer des états => angles
-            newa_continu = np.array([i*intervalle for i in x]) # conv int => double
-            fig    = plt.figure()
-            sfig = plt.subplot(nClred,n,im+n*cl+1)
-            sfig.axes.get_xaxis().set_visible(False)
-            sfig.axes.get_yaxis().set_visible(False)
-            tracerLettre(newa_continu)
-            plt.savefig("lettres_hmm.png")
-            plt.close(fig)
-'''
-lv_lst = []
-models = baum_welch_simplifie( lv_lst, X, Y,)
-evaluation_qualitative( X, Y, groupByLabel(Y), models)
-'''
-# test(X, Y, models)
 
 #### Rapport 02 ####
 
@@ -310,21 +229,7 @@ def iat (itrain, itest, Y_indice) :
 
     return ( ia_x, ia_y, it_x, it_y )
 
-def trace_comp(trainMeanRes, trainVarRes, testMeanRes, testVarRes, N, x_borne=None, y_borne=None):
-    fig = plt.figure()
-    if x_borne != None:
-        plt.xlim(x_borne[0],x_borne[1])
-    if y_borne != None:
-        plt.xlim(y_borne[0],y_borne[1])
-    plt.plot(range(len(trainMeanRes)), trainMeanRes, label='Train Mean')
-    plt.plot(range(len(trainVarRes)), trainVarRes, label='Train Variance')
-    plt.plot(range(len(testMeanRes)),  testMeanRes,  label='Test Mean')
-    plt.plot(range(len(testVarRes)),  testVarRes,  label='Test Variance')
-    plt.legend()
-    plt.savefig("comparation_performance_train_test[N=%d].png"%N)
-    plt.close(fig)
-    
-def main():
+def main(data, X, Y, nCl):
     data = pkl.load(file("TME6_lettres.pkl","rb"))
     X = np.array(data.get('letters')) # récupération des données sur les lettres
     Y = np.array(data.get('labels')) # récupération des étiquettes associées
@@ -335,42 +240,25 @@ def main():
     Y_indice = np.unique(Y)
     ( ia_x, ia_y, it_x, it_y ) = iat (itrain, itest, Y_indice)
     
-    # initTo0: True or False
-    initTo0 = True
-    
     # ---- Biais d'évaluation, notion de sur-apprentissage ----
-    for N in range(4,8):
-        trainMeanRes = []
-        trainVarRes  = []
-        testMeanRes  = []
-        testVarRes   = []
-        for K in range(5,26):
-            modeles = baum_welch_simplifie( [], Xtrain, Ytrain, N, K, initTo0)
-            (mean,var) = evaluation_des_performances( discretisation( Xtrain, K ), Ytrain, modeles, N, K, "Train")
-            trainMeanRes.append(mean)
-            # ---- Biais-Variance ----
-            trainVarRes.append(var)
-            (mean,var) = evaluation_des_performances( discretisation( Xtest,  K ), Ytest, modeles, N, K, "Test")
-            testMeanRes.append(mean)
-            # ---- Biais-Variance ----
-            testVarRes.append(var)
-            # ---- Evaluation qualitative ----
-            evaluation_qualitative( discretisation( X, K ), it_y, itest, modeles, N, K)
+    for N in range(2,8):
+        trainRes = []
+        testRes  = []
+        trainVarRes = []
+        testVarRes  = []
+        kRange = range(5,200)
+        for K in kRange:
+            modeles = baum_welch_simplifie( [], Xtrain, Ytrain, N, K)
+            time.sleep(5)
+            aMean, aVar = evaluation_des_performances( discretisation( Xtrain, K ), Ytrain, modeles, K )
+            tMean, tVar = evaluation_des_performances( discretisation( Xtest,  K ), Ytest, modeles,  K )
+            trainRes.append(aMean)
+            testRes.append(tMean)
+            trainVarRes.append(aVar)
+            testVarRes.append(tVar)
             time.sleep(3)
-
-        trace_comp(trainMeanRes, trainVarRes, testMeanRes, testVarRes, N, (5,25))
-    
-    # ---- Modèle génératif ----
-    '''
-    modeles = baum_welch_simplifie( [], Xtrain, Ytrain, N, K, initTo0)
-    for lettre in range(len(alphabet)):
-        newa = generate(modeles[lettre][0],modeles[lettre][1], 25) # generation d'une séquence d'états
-        intervalle = 360./d # pour passer des états => valeur d'angles
-        newa_continu = np.array([i*intervalle for i in newa]) # conv int => double
-        tracerLettre(newa_continu, alphabet[lettre])
-    '''
-
-    
-    
+        np.save("Res[N=%d]"%(N), [trainRes, testRes, trainVarRes, testVarRes])
+            
 if __name__ == "__main__":
-    main()
+    data, X, Y, nCl = load_data('TME6_lettres.pkl')
+    main(data, X, Y, nCl)
