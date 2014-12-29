@@ -5,6 +5,8 @@ import heapq
 import numpy as np
 import pickle as pkl
 import os.path as op
+import matplotlib.cm as cm
+import matplotlib.pyplot as plt
 
 # fonction de suppression des 0 (certaines variances sont nulles car les pixels valent tous la même chose)
 def woZeros(x): 
@@ -30,14 +32,16 @@ def logpobs(X, theta):
 
 # Données au format pickle: le fichier contient X, XT, Y et YT
 # X et Y sont les données d'apprentissage; les matrices en T sont les données de test
-data = pkl.load(file('usps_small.pkl','rb'))
+def extraire_data():
+    data = pkl.load(file('usps_small.pkl','rb'))
+    
+    X = np.array(data['X'])
+    Y = np.array(data['Y'])
+    XT = np.array(data['XT'])
+    YT = np.array(data['YT'])
 
-X = np.array(data['X'])
-Y = np.array(data['Y'])
-XT = np.array(data['XT'])
-YT = np.array(data['YT'])
-
-theta = learnGauss ( X,Y ) # apprentissage
+    theta = learnGauss ( X,Y ) # apprentissage
+    return ( X,Y,XT,YT,theta )
 
 def taux_bonne_classification(X,Y,XT,YT,theta):
     logp  = logpobs(X, theta)  # application des modèles sur les données d'apprentissage
@@ -118,10 +122,25 @@ def groupByLabel( y ) :
         index.append( ind )
     return index
 
-def un_contre_tous(X,Y,XT,YT):
-    nom_iter= 3
-    epsilon = .00005
-    thetaRL = apprendre_classifieurs(X,Y,nom_iter,epsilon)
+def evaluation_qualitative( X, Y, group, models,label=""):
+    conf = np.zeros((10,10))
+    for i, cls in enumerate(group):
+        for echantillon in cls:
+            conf[i, np.argmax([ f( X[echantillon], mdl[0], mdl[1] ) for mdl in models ]) ] += 1
+    fig = plt.figure()
+    plt.imshow(conf, interpolation='nearest')
+    plt.colorbar()
+    plt.xticks(np.arange(10),np.unique(Y))
+    plt.yticks(np.arange(10),np.unique(Y))
+    plt.xlabel(u'Vérité terrain')
+    plt.ylabel(u'Prédiction')
+    plt.savefig("evaluation_qualitative[%s].png"%label)
+    plt.close(fig)
+    
+def un_contre_tous(X,Y,XT,YT, thetaRL,label=''):
+    # nom_iter= 3
+    # epsilon = .00005
+    # thetaRL = apprendre_classifieurs(X,Y,nom_iter,epsilon)
     
     pRL  = np.array([[ f(x,mod[0],mod[1]) for x in X ] for mod in thetaRL ])
     pRLT = np.array([[ f(x,mod[0],mod[1]) for x in XT] for mod in thetaRL ])
@@ -132,10 +151,12 @@ def un_contre_tous(X,Y,XT,YT):
     print "Taux bonne classification en apprentissage : ",np.where(ypred != Y, 0.,1.).mean()
     print "Taux bonne classification en test : ",np.where(ypredT != YT, 0.,1.).mean()
     
-    taux_bonne_classification(X,Y,XT,YT,theta)
+    # taux_bonne_classification(X,Y,XT,YT,theta)
     
-    group = groupByLabel(YT)
-    evaluation_qualitative( XT, YT, group, thetaRL)
+    # group = groupByLabel(YT)
+    # evaluation_qualitative( XT, YT, group, thetaRL, label)
+    
+    return np.where(ypred != Y, 0.,1.).mean(),np.where(ypredT != YT, 0.,1.).mean()
     
 # un_contre_tous(X,Y,XT,YT)
 
@@ -160,7 +181,6 @@ def nombre_genere(X,Y,nombre):
     mu    = learn_mu(X,Y,nombre)
     var   = learn_std(X,Y,nombre)
     x     = tirer_un_nombre(var, mu)
-    # dessine(x,"%s_generatif"%nombre)
     return (x,nombre)
     
 def modele_discriminant(X, Y, nombre, nom_iter=120, epsilon=.00005):
@@ -209,21 +229,6 @@ def ambigus_proche(X, Y, models, seuil):
 
 #### Rapport 02 ####
 '''
-def dessine_modeles_discriminants(X,Y):
-    nom_iter = 120
-    epsilon  = .00005
-    
-    for chiffre in range(10):
-        nombre_genere(X,Y,chiffre)
-
-    models = apprendre_classifieurs( x, y, nom_iter, epsilon )
-    for chiffre,ml in enumerate(models):
-        dessine(ml[0], "modele_discriminant[%d]"%chiffre)
-
-# dessine_modeles_discriminants(X,Y)
-'''
-
-'''
 models  = apprendre_classifieurs( X, Y )
 np.save("models", models)
 '''
@@ -235,6 +240,8 @@ def evaluer_passe_borne(X,Y,models):
             continue
         (Xp,Yp) = passe_borne(X,Y,models,seuil)
         if len(Y) == len(Yp):
+            continue
+        if len(X) == len(Xp):
             continue
         if len(np.unique(Y)) != len(np.unique(Yp)):
             continue
@@ -249,12 +256,96 @@ def evaluer_ambigus_proche(X,Y,models):
         (Xa,Ya) = ambigus_proche(X,Y,models,seuil)
         if len(Y) == len(Ya):
             continue
+        if len(X) == len(Xa):
+            continue
         if len(np.unique(Y)) != len(np.unique(Ya)):
             continue
         models3 = apprendre_classifieurs( Xa, Ya )
         np.save("models[ambigus_proche,seuil=%f]"%seuil,models3)
     
+def evaluer_passe_borne_modeles():
+    aList = []
+    tList = []
+    sList = []
+    for seuil in np.linspace(0,1,11):
+        if op.exists("models[passe_borne,seuil=%f].npy"%seuil):
+            print "---- passe_borne Seuil = %f ----"%seuil
+            models_load = np.load("models[passe_borne,seuil=%f].npy"%seuil)
+            aMean, tMean = un_contre_tous(X,Y,XT,YT, models_load)
+            aList.append(aMean)
+            tList.append(tMean)
+            sList.append(seuil)            
+            # group = groupByLabel(YT)
+            # evaluation_qualitative( XT, YT, group, models_load, "passe_borne,seuil=%f"%seuil)
+            
+    return ( aList, tList, sList)
+    
+def evaluer_ambigus_proche_modeles():
+    aList = []
+    tList = []
+    sList = []
+    for seuil in np.linspace(0,1,11):
+        if op.exists("models[ambigus_proche,seuil=%f].npy"%seuil):
+            print "---- ambigus_proche Seuil = %f ----"%seuil
+            models_load = np.load("models[ambigus_proche,seuil=%f].npy"%seuil)
+            aMean, tMean = un_contre_tous(X,Y,XT,YT, models_load)
+            aList.append(aMean)
+            tList.append(tMean)
+            sList.append(seuil)
+            # group = groupByLabel(YT)
+            # evaluation_qualitative( XT, YT, group, models_load, "ambigus_proche,seuil=%f"%seuil)
+            
+    return ( aList, tList, sList )    
+
+def trace_comp(aStd, tStd, trainRes, testRes, xList, x_borne=None, y_borne=None):
+    fig = plt.figure()
+    if len(trainRes) != len(testRes):
+        raise("InvalidDataSet")
+    if x_borne != None:
+        plt.xlim(x_borne[0],x_borne[1])
+    if y_borne != None:
+        plt.xlim(y_borne[0],y_borne[1])
+    plt.plot(xList, [aStd for i in xrange(len(xList))], label='Train[Original]')
+    plt.plot(xList, [tStd for i in xrange(len(xList))], label='Test[Original]')
+    plt.plot(xList, trainRes, label='Train[passe_borne]')
+    plt.plot(xList, testRes,  label='Test[passe_borne]')
+    
+    plt.legend()
+    plt.savefig("comparation_performance_train_test.png")
+    plt.close(fig)
+    
+def dessine_modeles_discriminants(X,Y, models):
+    nom_iter = 120
+    epsilon  = .00005
+    
+    for chiffre in range(10):
+        x,nombre = nombre_genere(X,Y,chiffre)
+        dessine(x,"%s_generatif"%nombre)
+        
+    for chiffre,ml in enumerate(models):
+        dessine(np.array(ml[0]), "modele_discriminant[%d]"%chiffre)
+
+def dessine(x,cname=None):
+    # pour afficher le vecteur des moyennes des pixels pour le modèle 0:
+    fig = plt.figure()
+    plt.imshow(x.reshape(16,16), cmap = cm.Greys_r, interpolation='nearest')
+    if cname == None:
+        plt.show()
+    else:
+        plt.savefig(cname)
+    plt.close(fig)
+        
 models = np.load("models.npy")
-evaluer_passe_borne(X,Y,models)
+X,Y,XT,YT,theta = extraire_data()
+
+# evaluer_passe_borne(X,Y,models)
 # evaluer_ambigus_proche(X,Y,models)
+group = groupByLabel(YT)
+# evaluation_qualitative( XT, YT, group, models, "models")
+
+aMean, tMean = un_contre_tous(X,Y,XT,YT, models)
+aList, tList, sList =  evaluer_ambigus_proche_modeles()
+# aList, tList, sList =  evaluer_passe_borne_modeles()
+trace_comp(aMean, tMean, aList, tList, sList)
+# dessine_modeles_discriminants(X,Y, models)
 

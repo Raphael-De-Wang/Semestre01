@@ -147,7 +147,6 @@ def baum_welch_simplifie( lv_lst, X, Y, N = 5, K = 10, initTo0=True):
                 lv  += p_est
                 
         lv_lst.append(lv)
-                
     return alpha
 
 def tracer_evolution_vraisemblance(lv_list):
