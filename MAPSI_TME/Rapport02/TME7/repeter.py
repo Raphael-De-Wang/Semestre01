@@ -2,6 +2,7 @@
 import time
 import numpy as np
 import pickle as pkl
+import os.path as op
 
 # truc pour un affichage plus convivial des matrices numpy
 np.set_printoptions(precision=2, linewidth=320)
@@ -242,6 +243,9 @@ def main(data, X, Y, nCl):
     
     # ---- Biais d'évaluation, notion de sur-apprentissage ----
     for N in range(2,8):
+        print "N = %d"%N
+        if op.exists("Res[N=%d,K=(5,200)].npy"%(N)):
+            continue
         trainRes = []
         testRes  = []
         trainVarRes = []
@@ -249,15 +253,13 @@ def main(data, X, Y, nCl):
         kRange = range(5,200)
         for K in kRange:
             modeles = baum_welch_simplifie( [], Xtrain, Ytrain, N, K)
-            time.sleep(5)
             aMean, aVar = evaluation_des_performances( discretisation( Xtrain, K ), Ytrain, modeles, K )
             tMean, tVar = evaluation_des_performances( discretisation( Xtest,  K ), Ytest, modeles,  K )
             trainRes.append(aMean)
             testRes.append(tMean)
             trainVarRes.append(aVar)
             testVarRes.append(tVar)
-            time.sleep(3)
-        np.save("Res[N=%d]"%(N), [trainRes, testRes, trainVarRes, testVarRes])
+        np.save("Res[N=%d,K=(5,200)]"%(N), [trainRes, testRes, trainVarRes, testVarRes])
             
 if __name__ == "__main__":
     data, X, Y, nCl = load_data('TME6_lettres.pkl')
