@@ -116,7 +116,10 @@ def evaluation_qualitative( X, Y, group, models, d=None):
     if d == None:
         plt.savefig("evaluation_qualitative.png")
     else:
-        plt.savefig("evaluation_qualitative(d=%d).png"%d)
+        ax = fig.add_subplot(111)
+        handles, labels = ax.get_legend_handles_labels()
+        lgd = ax.legend(handles, ["d=%d"%d], loc='upper left', bbox_to_anchor=(-0.5,1))
+        plt.savefig("evaluation_qualitative(d=%d).png"%d, bbox_extra_artists=(lgd,), bbox_inches='tight')
     plt.close(fig)
 
 def random_nombre ():
@@ -181,8 +184,11 @@ def trace_comp(trainRes, testRes, x_borne=None, y_borne=None):
         plt.xlim(y_borne[0],y_borne[1])
     plt.plot(range(len(trainRes)), trainRes, label='Train')
     plt.plot(range(len(testRes)),  testRes,  label='Test')
-    plt.legend()
-    plt.savefig("comparation_performance_train_test.png")
+    # plt.legend()
+    ax = fig.add_subplot(111)
+    handles, labels = ax.get_legend_handles_labels()
+    lgd = ax.legend(handles, labels, loc='upper left', bbox_to_anchor=(1,1))
+    plt.savefig("comparation_performance_train_test.png", bbox_extra_artists=(lgd,), bbox_inches='tight')
     plt.close(fig)
     
 def main():
@@ -197,7 +203,6 @@ def main():
     Y_indice = np.unique(Y)
     ( ia_x, ia_y, it_x, it_y ) = iat (itrain, itest, Y_indice)
     # ---- Biais d'évaluation, notion de sur-apprentissage ----
-    '''
     trainRes = []
     testRes  = []
     for d in range(3,41):
@@ -220,6 +225,7 @@ def main():
         intervalle = 360./d # pour passer des états => valeur d'angles
         newa_continu = np.array([i*intervalle for i in newa]) # conv int => double
         tracerLettre(newa_continu, alph[lettre])
+    '''
 
 if __name__ == "__main__":
     main()
