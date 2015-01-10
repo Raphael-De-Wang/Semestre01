@@ -309,7 +309,6 @@ def trace_comp(aStd, tStd, trainRes, testRes, xList, x_borne=None, y_borne=None)
     plt.plot(xList, [tStd for i in xrange(len(xList))], label='Test[Original]')
     plt.plot(xList, trainRes, label='Train[passe_borne]')
     plt.plot(xList, testRes,  label='Test[passe_borne]')
-    
     plt.legend()
     plt.savefig("comparation_performance_train_test.png")
     plt.close(fig)
